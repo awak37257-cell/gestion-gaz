@@ -2,19 +2,23 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
     <title>@yield('titre', 'Espace Vendeur')</title>
     <style>
         :root {
-            --couleur-primaire: #1e7a4c;
-            --couleur-primaire-fonce: #14562f;
-            --couleur-danger: #b3261e;
-            --couleur-fond: #f4f6f5;
-            --couleur-carte: #ffffff;
-            --couleur-texte: #1a1a1a;
-            --couleur-texte-clair: #666666;
-            --couleur-bordure: #d1d5db;
-            --rayon: 12px;
+            --couleur-primaire: #96692C;
+            --couleur-primaire-fonce: #7A5423;
+            --couleur-danger: #8C3A2B;
+            --couleur-fond: #F3F2EE;
+            --couleur-carte: #FFFFFF;
+            --couleur-texte: #1B1F1D;
+            --couleur-texte-clair: #6E7268;
+            --couleur-bordure: #DEDBD2;
+            --rayon: 4px;
+            --police-titre: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+            --police-chiffres: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            --degrade-primaire: linear-gradient(135deg, #B8863D 0%, #7A3B3E 100%);
+            --degrade-primaire-hover: linear-gradient(135deg, #A8763A 0%, #6B2E33 100%);
         }
 
         * { box-sizing: border-box; }
@@ -24,67 +28,104 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: var(--couleur-fond);
             color: var(--couleur-texte);
+            font-variant-numeric: tabular-nums;
+        }
+
+        h1, h2, h3 {
+            font-family: var(--police-titre);
+            font-weight: 600;
+            letter-spacing: -0.01em;
         }
 
         .entete {
-            background: var(--couleur-primaire);
+            background: linear-gradient(135deg, #1B1F1D 0%, #262B27 55%, #33241F 100%);
             color: #fff;
             padding: 18px 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-bottom: 3px solid;
+            border-image: linear-gradient(90deg, #B8863D, #7A3B3E) 1;
         }
 
-        .entete h1 { margin: 0; font-size: 19px; font-weight: 600; }
-        .entete p { margin: 5px 0 0; font-size: 13px; opacity: 0.95; }
+        .entete-ligne { display: flex; align-items: center; gap: 10px; }
+        .entete h1 { margin: 0; font-size: 17px; font-weight: 600; }
+        .entete p {
+            margin: 5px 0 0;
+            font-size: 11px;
+            opacity: 0.75;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
 
         main {
-            padding: 20px 16px;
+            padding: 16px;
             max-width: 480px;
             margin: 0 auto;
         }
 
         .message {
-            padding: 14px 16px;
+            padding: 12px 14px;
             border-radius: var(--rayon);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             font-size: 14px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            border: 1px solid transparent;
         }
 
-        .message-succes { background: #e3f5ea; color: var(--couleur-primaire-fonce); border-left: 4px solid var(--couleur-primaire); }
-        .message-erreur { background: #fbe9e7; color: var(--couleur-danger); border-left: 4px solid var(--couleur-danger); }
+        .message-succes { background: #F1F4EF; color: #3F6B4A; border-color: #D3DFCF; }
+        .message-erreur { background: #FBEEEB; color: var(--couleur-danger); border-color: #EAD1CB; }
 
         .carte {
             background: var(--couleur-carte);
+            border: 1px solid var(--couleur-bordure);
             border-radius: var(--rayon);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.02);
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(27,31,29,0.05);
+            position: relative;
         }
 
-        label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #333; }
+        .carte-accent { padding-left: 22px; }
+        .carte-accent::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            border-radius: var(--rayon) 0 0 var(--rayon);
+            background: var(--degrade-primaire);
+        }
+
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--couleur-texte); }
 
         input, select {
             width: 100%;
-            padding: 12px 14px;
+            padding: 13px 14px;
             font-size: 16px;
-            border: 1px solid var(--couleur-bordure);
-            border-radius: var(--rayon);
+            font-family: inherit;
+            border: 1.5px solid var(--couleur-bordure);
+            border-radius: 6px;
             margin-bottom: 16px;
-            background: #fff;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #FAFAF7;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: var(--couleur-primaire);
-            box-shadow: 0 0 0 3px rgba(30, 122, 76, 0.15);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(150,105,44,0.14);
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236E7268' stroke-width='1.6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
         }
 
         input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
-            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
             vertical-align: middle;
             accent-color: var(--couleur-primaire);
         }
@@ -93,46 +134,48 @@
             display: block;
             width: 100%;
             padding: 14px;
-            font-size: 16px;
+            font-size: 13px;
             font-weight: 600;
             text-align: center;
-            border: none;
-            border-radius: var(--rayon);
+            border: 1.5px solid transparent;
+            border-radius: 6px;
             cursor: pointer;
             text-decoration: none;
             min-height: 48px;
-            transition: background 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
         }
 
-        .bouton-primaire { background: var(--couleur-primaire); color: #fff; }
-        .bouton-primaire:hover { background: var(--couleur-primaire-fonce); }
-        
-        .bouton-secondaire { background: #e5e7eb; color: var(--couleur-texte); margin-top: 10px; }
-        .bouton-secondaire:hover { background: #d1d5db; }
-        
-        .bouton-danger { background: transparent; color: var(--couleur-danger); text-decoration: underline; border: none; }
+        .bouton-primaire { background: var(--degrade-primaire); color: #fff; box-shadow: 0 3px 10px rgba(122,59,62,0.28); }
+        .bouton-primaire:hover { background: var(--degrade-primaire-hover); transform: translateY(-1px); box-shadow: 0 5px 14px rgba(122,59,62,0.34); }
+
+        .bouton-secondaire { background: #fff; color: var(--couleur-texte); border-color: var(--couleur-bordure); margin-top: 10px; }
+        .bouton-secondaire:hover { border-color: var(--couleur-primaire); background: #FAF7F2; }
+
+        .bouton-danger { background: transparent; color: var(--couleur-danger); text-decoration: underline; text-transform: none; letter-spacing: normal; border: none; }
 
         .lien-retour {
             display: block;
             text-align: center;
-            margin-top: 16px;
+            margin-top: 14px;
             color: var(--couleur-texte-clair);
-            font-size: 14px;
-            text-decoration: none;
+            font-size: 13px;
         }
-        .lien-retour:hover { text-decoration: underline; }
 
-        .erreur-champ { color: var(--couleur-danger); font-size: 13px; margin-top: -10px; margin-bottom: 14px; font-weight: 500; }
+        .erreur-champ { color: var(--couleur-danger); font-size: 13px; margin-top: -12px; margin-bottom: 14px; }
 
         .badge {
             display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-size: 11px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
-        .badge-changement { background: #fff2cc; color: #8a6d00; }
+        .badge-changement { background: #F7F1E6; color: #7A5423; border: 1px solid #E8DABF; }
 
         @media print {
             .no-print, .entete { display: none !important; }
@@ -143,7 +186,14 @@
 </head>
 <body>
     <div class="entete">
-        <h1>@yield('titre', 'Espace Vendeur')</h1>
+        <div class="entete-ligne">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="#96692C" stroke-width="1.6"/>
+                <line x1="12" y1="12" x2="16" y2="7" stroke="#96692C" stroke-width="1.6" stroke-linecap="round"/>
+                <circle cx="12" cy="12" r="1.6" fill="#96692C"/>
+            </svg>
+            <h1>@yield('titre', 'Espace Vendeur')</h1>
+        </div>
         @isset($vendeur)
             <p>{{ $vendeur->nom }} — Dépôt {{ $vendeur->depot->nom }}</p>
         @endisset

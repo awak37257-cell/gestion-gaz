@@ -6,402 +6,343 @@
     <title>@yield('titre', 'Administration')</title>
     <style>
         :root {
-            --couleur-primaire: #1e7a4c;
-            --couleur-primaire-fonce: #14562f;
-            --couleur-primaire-clair: #e3f5ea;
-            --couleur-danger: #b3261e;
-            --couleur-danger-clair: #fbe9e7;
-            --couleur-warning: #f59e0b;
-            --couleur-warning-clair: #fff2cc;
-            --couleur-info: #3b82f6;
-            --couleur-info-clair: #dbe9fb;
-            --couleur-fond: #f4f6f5;
-            --couleur-carte: #ffffff;
-            --couleur-texte: #1a1a1a;
-            --couleur-texte-clair: #666666;
-            --couleur-bordure: #e2e2e2;
-            --rayon: 10px;
-            --ombre: 0 2px 6px rgba(0,0,0,0.04);
-            --transition: all 0.3s ease;
+            --couleur-primaire: #96692C;
+            --couleur-primaire-fonce: #7A5423;
+            --couleur-danger: #8C3A2B;
+            --couleur-fond: #F3F2EE;
+            --couleur-carte: #FFFFFF;
+            --couleur-texte: #1B1F1D;
+            --couleur-texte-clair: #6E7268;
+            --couleur-bordure: #DEDBD2;
+            --rayon: 4px;
+            --police-titre: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+            --police-chiffres: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            --degrade-primaire: linear-gradient(135deg, #B8863D 0%, #7A3B3E 100%);
+            --degrade-primaire-hover: linear-gradient(135deg, #A8763A 0%, #6B2E33 100%);
+            --degrade-danger: linear-gradient(135deg, #B14E3D 0%, #7A2A20 100%);
         }
 
-        * { 
-            box-sizing: border-box; 
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: var(--couleur-fond);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background:
+                radial-gradient(circle at 100% 0%, rgba(184,134,61,0.05), transparent 45%),
+                var(--couleur-fond);
             color: var(--couleur-texte);
             display: flex;
             min-height: 100vh;
+            font-variant-numeric: tabular-nums;
         }
 
-        /* ===== BARRE LATÉRALE ===== */
+        h1, h2, h3 {
+            font-family: var(--police-titre);
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
         .barre-laterale {
-            width: 260px;
-            background: #112719;
+            width: 230px;
+            background: linear-gradient(180deg, #1B1F1D 0%, #262B27 100%);
             color: #fff;
             padding: 24px 0;
             flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 2px 0 12px rgba(0,0,0,0.08);
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 1000;
-            transition: transform 0.3s ease;
         }
 
-        .barre-laterale::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .barre-laterale::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 4px;
-        }
-
-        .barre-laterale-haut h2 {
-            font-size: 18px;
-            padding: 0 20px 18px;
+        .barre-laterale h2 {
+            font-family: var(--police-titre);
+            font-size: 16px;
+            font-weight: 600;
+            padding: 0 24px 18px;
             margin: 0;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            color: #e2f0e6;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .barre-laterale nav { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 2px;
-            margin-top: 15px; 
-            padding: 0 12px;
-        }
+        .barre-laterale nav { display: flex; flex-direction: column; margin-top: 14px; }
 
         .barre-laterale a {
-            color: #c2d6cb;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            color: rgba(255,255,255,0.65);
             text-decoration: none;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: var(--transition);
+            padding: 11px 24px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-left: 3px solid transparent;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
         }
 
-        .barre-laterale a:hover { 
-            background: rgba(255,255,255,0.08); 
-            color: #fff; 
+        .barre-laterale a svg { flex-shrink: 0; opacity: 0.85; }
+
+        .barre-laterale a:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .barre-laterale a.actif {
+            color: #fff;
+            background: linear-gradient(90deg, rgba(184,134,61,0.22), rgba(122,59,62,0.08));
+            border-left-color: var(--couleur-primaire);
         }
 
-        .barre-laterale a.actif { 
-            background: rgba(30, 122, 76, 0.25); 
-            color: #fff; 
-            font-weight: 500;
-            border-left: 3px solid var(--couleur-primaire);
-        }
-
-        /* Zone de déconnexion */
-        .barre-laterale-bas {
-            padding: 0 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 15px;
-        }
-
-        .btn-deconnexion {
-            background: transparent;
-            border: none;
-            color: #ff9999;
-            width: 100%;
-            text-align: left;
-            padding: 10px 14px;
-            font-size: 14px;
-            border-radius: 8px;
+        .barre-laterale form button {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: rgba(255,255,255,0.85);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
             cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .btn-deconnexion:hover {
-            background: rgba(179, 38, 30, 0.2);
-            color: #ff6666;
-        }
-
-        /* ===== CONTENU PRINCIPAL ===== */
-        .contenu { 
-            flex: 1; 
-            padding: 28px 36px; 
-            max-width: 1400px; 
+            padding: 9px 14px;
+            border-radius: var(--rayon);
             width: 100%;
-            overflow-x: auto;
         }
+
+        .barre-laterale form button:hover { background: rgba(255,255,255,0.16); color: #fff; }
+
+        .contenu { flex: 1; padding: 32px 40px; max-width: 1120px; }
 
         .entete-page {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--couleur-bordure);
         }
 
-        .entete-page h1 { 
-            font-size: 26px; 
-            margin: 0; 
-            color: #112719;
-        }
+        .entete-page h1 { font-size: 22px; margin: 0; }
 
-        /* ===== MESSAGES FLASH ===== */
         .message {
-            padding: 14px 20px;
+            padding: 12px 14px;
             border-radius: var(--rayon);
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             font-size: 14px;
-            box-shadow: var(--ombre);
-            animation: slideDown 0.3s ease;
+            border: 1px solid transparent;
         }
 
-        .message-succes { 
-            background: var(--couleur-primaire-clair); 
-            color: var(--couleur-primaire-fonce); 
-            border-left: 4px solid var(--couleur-primaire); 
-        }
+        .message-succes { background: #F1F4EF; color: #3F6B4A; border-color: #D3DFCF; }
+        .message-erreur { background: #FBEEEB; color: var(--couleur-danger); border-color: #EAD1CB; }
 
-        .message-erreur { 
-            background: var(--couleur-danger-clair); 
-            color: var(--couleur-danger); 
-            border-left: 4px solid var(--couleur-danger); 
-        }
-
-        .message-warning {
-            background: var(--couleur-warning-clair);
-            color: #8a6d00;
-            border-left: 4px solid var(--couleur-warning);
-        }
-
-        .message-info {
-            background: var(--couleur-info-clair);
-            color: #1c4a8a;
-            border-left: 4px solid var(--couleur-info);
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ===== CARTES ===== */
         .carte {
             background: var(--couleur-carte);
+            border: 1px solid var(--couleur-bordure);
             border-radius: var(--rayon);
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: var(--ombre);
-            border: 1px solid rgba(0,0,0,0.03);
-            transition: var(--transition);
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(27,31,29,0.05);
+            position: relative;
+            transition: box-shadow 0.15s ease;
         }
 
-        .carte:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        .carte-accent, .carte-accent-danger { padding-left: 26px; }
+
+        .carte-accent::before, .carte-accent-danger::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            border-radius: var(--rayon) 0 0 var(--rayon);
         }
 
-        /* ===== TABLEAUX ===== */
-        table { 
-            width: 100%; 
-            border-collapse: collapse;
+        .carte-accent::before { background: var(--degrade-primaire); }
+        .carte-accent-danger::before { background: var(--degrade-danger); }
+
+        .carte-stat {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
+
+        .icone-badge {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: var(--degrade-primaire);
+            box-shadow: 0 3px 8px rgba(122,59,62,0.22);
+        }
+
+        .icone-badge.danger { background: var(--degrade-danger); box-shadow: 0 3px 8px rgba(122,42,32,0.22); }
+        .icone-badge svg { stroke: #fff; }
+
+        .icone-badge-petit {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: var(--degrade-primaire);
+            box-shadow: 0 2px 6px rgba(122,59,62,0.22);
+        }
+
+        .icone-badge-petit svg { stroke: #fff; }
+
+        .entete-page-titre { display: flex; align-items: center; gap: 14px; }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        tbody tr:nth-child(even) { background: rgba(27,31,29,0.015); }
+        tbody tr:hover { background: #F7F5F0; }
 
         th, td {
             text-align: left;
-            padding: 12px 16px;
+            padding: 11px 12px;
             border-bottom: 1px solid var(--couleur-bordure);
-            font-size: 14px;
+            font-size: 13.5px;
         }
 
-        th { 
-            color: var(--couleur-texte-clair); 
-            font-weight: 600; 
-            background-color: #fafafa;
+        th {
+            color: var(--couleur-texte-clair);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.06em;
         }
 
-        tr:hover td {
-            background: #fafbfa;
-        }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
 
-        /* ===== FORMULAIRES ===== */
-        label { 
-            display: block; 
-            font-size: 14px; 
-            font-weight: 600; 
-            margin-bottom: 6px; 
-            color: #333;
-        }
-
-        input, select, textarea {
+        input, select {
             width: 100%;
-            max-width: 500px;
-            padding: 10px 14px;
+            max-width: 360px;
+            padding: 11px 14px;
             font-size: 14px;
-            border: 1px solid #d1d5db;
-            border-radius: var(--rayon);
+            font-family: inherit;
+            border: 1.5px solid var(--couleur-bordure);
+            border-radius: 6px;
             margin-bottom: 16px;
-            background: #fff;
-            transition: var(--transition);
+            background: #FAFAF7;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: var(--couleur-primaire);
-            box-shadow: 0 0 0 3px rgba(30, 122, 76, 0.1);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(150,105,44,0.14);
         }
 
-        input.erreur, select.erreur, textarea.erreur {
-            border-color: var(--couleur-danger);
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236E7268' stroke-width='1.6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
         }
 
-        .erreur-champ { 
-            color: var(--couleur-danger); 
-            font-size: 13px; 
-            margin-top: -12px; 
-            margin-bottom: 14px;
-        }
-
-        /* ===== BOUTONS ===== */
         .bouton {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 20px;
-            font-size: 14px;
+            display: inline-block;
+            padding: 10px 18px;
+            font-size: 12px;
             font-weight: 600;
-            border: none;
-            border-radius: var(--rayon);
+            text-align: center;
+            border: 1.5px solid transparent;
+            border-radius: 6px;
             cursor: pointer;
             text-decoration: none;
-            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
         }
 
-        .bouton:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        .bouton-primaire {
+            background: var(--degrade-primaire);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(122,59,62,0.25);
         }
+        .bouton-primaire:hover { background: var(--degrade-primaire-hover); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(122,59,62,0.32); }
 
-        .bouton-primaire { background: var(--couleur-primaire); color: #fff; }
-        .bouton-primaire:hover:not(:disabled) { background: var(--couleur-primaire-fonce); }
+        .bouton-secondaire { background: #fff; color: var(--couleur-texte); border-color: var(--couleur-bordure); }
+        .bouton-secondaire:hover { border-color: var(--couleur-primaire); background: #FAF7F2; }
 
-        .bouton-secondaire { background: #e5e7eb; color: var(--couleur-texte); }
-        .bouton-secondaire:hover:not(:disabled) { background: #d1d5db; }
+        .bouton-danger { background: #fff; color: var(--couleur-danger); border-color: #EAD1CB; }
+        .bouton-danger:hover { background: #FBEEEB; }
 
-        .bouton-danger { background: var(--couleur-danger); color: #fff; }
-        .bouton-danger:hover:not(:disabled) { background: #8f1e18; }
+        .bouton-petit { padding: 6px 12px; font-size: 11px; }
 
-        .bouton-petit { padding: 6px 14px; font-size: 13px; }
+        .erreur-champ { color: var(--couleur-danger); font-size: 13px; margin-top: -12px; margin-bottom: 14px; }
 
-        /* ===== BADGES ===== */
-        .badge { 
-            display: inline-block; 
-            padding: 3px 12px; 
-            border-radius: 20px; 
-            font-size: 12px; 
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-size: 11px;
             font-weight: 600;
-            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
-        .badge-attente { background: #fff2cc; color: #8a6d00; }
-        .badge-validee { background: #dbe9fb; color: #1c4a8a; }
-        .badge-livree { background: #e3f5ea; color: var(--couleur-primaire-fonce); }
-        .badge-inactif { background: #f0f0f0; color: #888; }
-        .badge-actif { background: #e3f5ea; color: var(--couleur-primaire-fonce); }
+        .badge-attente { background: #F7F1E6; color: #7A5423; border: 1px solid #E8DABF; }
+        .badge-validee { background: #EEF1F4; color: #3D5266; border: 1px solid #D6DEE5; }
+        .badge-livree { background: #F1F4EF; color: #3F6B4A; border: 1px solid #D3DFCF; }
+        .badge-inactif { background: #F1F0EC; color: #8A8D85; border: 1px solid var(--couleur-bordure); }
 
-        /* ===== UTILITAIRES ===== */
         form.inline { display: inline; }
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .text-danger { color: var(--couleur-danger); }
-        .text-success { color: var(--couleur-primaire); }
-        .text-muted { color: var(--couleur-texte-clair); }
-        .mt-2 { margin-top: 16px; }
-        .mb-2 { margin-bottom: 16px; }
-        .flex { display: flex; }
-        .flex-center { align-items: center; }
-        .gap-2 { gap: 10px; }
-        .flex-wrap { flex-wrap: wrap; }
-        .w-full { width: 100%; }
 
-        .separateur {
-            height: 1px;
-            background: var(--couleur-bordure);
-            margin: 20px 0;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) {
-            .contenu { padding: 20px 24px; }
-        }
-
-        @media (max-width: 768px) {
-            .barre-laterale {
-                position: fixed;
-                transform: translateX(-100%);
-                width: 280px;
-            }
-
-            .barre-laterale.ouverte {
-                transform: translateX(0);
-            }
-
-            .contenu { 
-                padding: 16px; 
-            }
-
-            .entete-page h1 { font-size: 20px; }
-        }
-
-        @media (max-width: 480px) {
-            .contenu { padding: 12px; }
-            .entete-page h1 { font-size: 18px; }
-            .carte { padding: 16px; }
-            th, td { padding: 8px 10px; font-size: 13px; }
-        }
-
-        /* ===== IMPRESSION ===== */
         @media print {
-            .no-print, .barre-laterale { 
-                display: none !important; 
-            }
-            body { display: block; background: white; }
+            .no-print, .barre-laterale { display: none !important; }
+            body { display: block; }
             .contenu { padding: 0; max-width: 100%; }
-            .carte { box-shadow: none; border: 1px solid #ddd; }
         }
     </style>
 </head>
 <body>
-    <div class="barre-laterale no-print">
-        <div class="barre-laterale-haut">
-            <h2>Gestion Dépôt Gaz</h2>
-            <nav>
-                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'actif' : '' }}">Tableau de bord</a>
-                <a href="{{ route('admin.depots.index') }}" class="{{ request()->routeIs('admin.depots.*') ? 'actif' : '' }}">Dépôts</a>
-                <a href="{{ route('admin.marques.index') }}" class="{{ request()->routeIs('admin.marques.*') ? 'actif' : '' }}">Marques</a>
-                <a href="{{ route('admin.couleurs.index') }}" class="{{ request()->routeIs('admin.couleurs.*') ? 'actif' : '' }}">Couleurs</a>
-                <a href="{{ route('admin.vendeurs.index') }}" class="{{ request()->routeIs('admin.vendeurs.*') ? 'actif' : '' }}">Vendeurs</a>
-                <a href="{{ route('admin.stocks.index') }}" class="{{ request()->routeIs('admin.stocks.*') ? 'actif' : '' }}">Stocks</a>
-                <a href="{{ route('admin.demandes.index') }}" class="{{ request()->routeIs('admin.demandes.*') ? 'actif' : '' }}">Demandes</a>
-                <a href="{{ route('admin.inventaires.index') }}" class="{{ request()->routeIs('admin.inventaires.*') ? 'actif' : '' }}">Inventaires</a>
-            </nav>
-        </div>
+    <div class="barre-laterale">
+        <h2>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="#96692C" stroke-width="1.6"/>
+                <line x1="12" y1="12" x2="16" y2="7" stroke="#96692C" stroke-width="1.6" stroke-linecap="round"/>
+                <circle cx="12" cy="12" r="1.6" fill="#96692C"/>
+            </svg>
+            Gestion Dépôt Gaz
+        </h2>
+        <nav>
+            <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'actif' : '' }}">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="0.5"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="0.5"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="0.5"/><rect x="9" y="9" width="5.5" height="5.5" rx="0.5"/></svg>
+                Tableau de bord
+            </a>
+            <a href="{{ route('admin.depots.index') }}" class="{{ request()->routeIs('admin.depots.*') ? 'actif' : '' }}">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1.5 6.5L8 2l6.5 4.5V14h-13V6.5z"/><path d="M6 14V9h4v5"/></svg>
+                Dépôts
+            </a>
+            <a href="{{ route('admin.marques.index') }}" class="{{ request()->routeIs('admin.marques.*') ? 'actif' : '' }}">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 2h5.5L14 8.5 8.5 14 2 7.5V2z"/><circle cx="5" cy="5" r="0.8" fill="currentColor" stroke="none"/></svg>
+                Marques
+            </a>
+            <a href="{{ route('admin.couleurs.index') }}" class="{{ request()->routeIs('admin.couleurs.*') ? 'actif' : '' }}">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.2"/><circle cx="8" cy="5.3" r="0.9" fill="currentColor" stroke="none"/><circle cx="5.3" cy="9.5" r="0.9" fill="currentColor" stroke="none"/><circle cx="10.7" cy="9.5" r="0.9" fill="currentColor" stroke="none"/></svg>
+                Couleurs
+            </a>
+            <a href="{{ route('admin.vendeurs.index') }}" class="{{ request()->routeIs('admin.vendeurs.*') ? 'actif' : '' }}">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4.5" r="2.5"/><path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/></svg>
+                Vendeurs
+            </a>
+            <a href="{{ route('admin.stocks.index') }}" class="{{ request()->routeIs('admin.stocks.*') ? 'actif' : '' }}">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="8.5" width="5.5" height="5.5"/><rect x="9" y="8.5" width="5.5" height="5.5"/><rect x="5.2" y="2" width="5.5" height="5.5"/></svg>
+                Stocks
+            </a>
+            <a href="{{ route('admin.demandes.index') }}" class="{{ request()->routeIs('admin.demandes.*') ? 'actif' : '' }}">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 1.5h6l2.5 2.5V14.5h-8.5V1.5z"/><path d="M6 7h4M6 9.5h4M6 12h2.5"/></svg>
+                Demandes
+            </a>
+            <a href="{{ route('admin.inventaires.index') }}" class="{{ request()->routeIs('admin.inventaires.*') ? 'actif' : '' }}">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="2" width="11" height="12" rx="0.5"/><path d="M5 6.5l1 1 2-2M5 11l1 1 2-2"/><path d="M10 6.5h3M10 11h3"/></svg>
+                Inventaires
+            </a>
+        </nav>
 
-        <div class="barre-laterale-bas">
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="btn-deconnexion">Déconnexion</button>
-            </form>
-        </div>
+        <form method="POST" action="{{ route('logout') }}" style="padding:0 24px;margin-top:24px;">
+            @csrf
+            <button type="submit">Déconnexion</button>
+        </form>
     </div>
 
     <div class="contenu">
