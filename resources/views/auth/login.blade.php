@@ -35,27 +35,49 @@
             max-width: 400px;
             background: var(--couleur-carte);
             border-radius: var(--rayon);
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border: 1px solid var(--couleur-bordure);
         }
 
-        h1 { font-size: 22px; margin-top: 0; margin-bottom: 20px; text-align: center; color: var(--couleur-primaire-fonce); }
+        h1 { 
+            font-size: 22px; 
+            margin-top: 0; 
+            margin-bottom: 24px; 
+            text-align: center; 
+            color: var(--couleur-primaire-fonce); 
+        }
         
-        label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        label { 
+            display: block; 
+            font-size: 13px; 
+            font-weight: 600; 
+            margin-bottom: 6px; 
+            color: var(--couleur-texte);
+        }
 
-        input {
+        input[type="email"],
+        input[type="password"] {
             width: 100%;
-            padding: 10px;
+            padding: 10px 12px;
             font-size: 14px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--couleur-bordure);
             border-radius: var(--rayon);
             margin-bottom: 16px;
+            background: #fff;
+            transition: border-color 0.15s;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--couleur-primaire);
         }
 
         .bouton {
             display: block;
             width: 100%;
-            padding: 10px;
+            padding: 11px;
             font-size: 14px;
             font-weight: 600;
             text-align: center;
@@ -64,10 +86,17 @@
             cursor: pointer;
             background: var(--couleur-primaire);
             color: #fff;
+            transition: background 0.15s;
         }
 
         .bouton:hover { background: var(--couleur-primaire-fonce); }
-        .erreur-champ { color: var(--couleur-danger); font-size: 13px; margin-top: -12px; margin-bottom: 14px; }
+        
+        .erreur-champ { 
+            color: var(--couleur-danger); 
+            font-size: 12px; 
+            margin-top: -12px; 
+            margin-bottom: 14px; 
+        }
     </style>
 </head>
 <body>
@@ -79,7 +108,7 @@
             @csrf
 
             <div>
-                <label for="email">Adresse Email</label>
+                <label for="email">Adresse email</label>
                 <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus>
                 @error('email')
                     <div class="erreur-champ">{{ $message }}</div>
@@ -94,9 +123,9 @@
                 @enderror
             </div>
 
-            <div style="margin-bottom: 16px;">
-                <label style="font-weight: normal; display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="checkbox" name="se_souvenir" style="width: auto; margin: 0;"> Se souvenir de moi
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: normal; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--couleur-texte-clair);">
+                    <input type="checkbox" name="se_souvenir" style="width: auto; margin: 0; accent-color: var(--couleur-primaire);"> Se souvenir de moi
                 </label>
             </div>
 
