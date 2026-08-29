@@ -1,0 +1,59 @@
+<?php
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DemandeApprovisionnementController;
+use App\Http\Controllers\VendeurAccessController;
+use App\Http\Controllers\VenteController;
+use App\Http\Controllers\Admin\CouleurController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\DemandeApprovisionnementController as AdminDemandeController;
+use App\Http\Controllers\Admin\DepotController;
+use App\Http\Controllers\Admin\MarqueController;
+use App\Http\Controllers\Admin\StockController;
+use App\Http\Controllers\Admin\VendeurController as AdminVendeurController;
+use App\Http\Controllers\Admin\InventaireController as AdminInventaireController;
+use App\Http\Controllers\InventaireController;
+use App\Http\Controllers\Auth\LoginController;
+
+Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    Route::resource('depots', DepotController::class)->except('show');
+    Route::resource('marques', MarqueController::class)->except('show');
+    Route::resource('couleurs', CouleurController::class)->except('show');
+    Route::resource('vendeurs', AdminVendeurController::class);
+
+    Route::get('/stocks', [StockController::class, 'index'])->name('stocks.index');
+    Route::patch('/stocks/{stock}', [StockController::class, 'update'])->name('stocks.update');
+
+    Route::get('/demandes', [AdminDemandeController::class, 'index'])->name('demandes.index');
+    Route::patch('/demandes/{demande}/valider', [AdminDemandeController::class, 'valider'])->name('demandes.valider');
+    Route::patch('/demandes/{demande}/livrer', [AdminDemandeController::class, 'livrer'])->name('demandes.livrer');
+    Route::get('/inventaires', [AdminInventaireController::class, 'index'])->name('inventaires.index');
+});
+// Accès via QR code personnel du vendeur
+Route::get('/vendeur/scan/{tokenQr}', [VendeurAccessController::class, 'scan'])->name('vendeur.scan');
+
+Route::middleware('vendeur.connecte')->prefix('vendeur')->name('vendeur.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/deconnexion', [VendeurAccessController::class, 'deconnexion'])->name('deconnexion');
+
+    Route::get('/ventes/creer', [VenteController::class, 'create'])->name('ventes.create');
+    Route::post('/ventes', [VenteController::class, 'store'])->name('ventes.store');
+
+    Route::get('/demandes/creer', [DemandeApprovisionnementController::class, 'create'])->name('demandes.create');
+    Route::post('/demandes', [DemandeApprovisionnementController::class, 'store'])->name('demandes.store');
+Route::get('/ventes/{vente}/recu', [VenteController::class, 'recu'])->name('ventes.recu');
+
+Route::get('/inventaires/creer', [InventaireController::class, 'create'])->name('inventaires.create');
+Route::post('/inventaires', [InventaireController::class, 'store'])->name('inventaires.store');
+Route::get('/inventaires/{inventaire}', [InventaireController::class, 'show'])->name('inventaires.show');
+
+    });
+    // Afficher le formulaire de connexion (GET)
+Route::get('/login', [LoginController::class, 'create'])->name('login');
+
+// Traiter la connexion (POST)
+Route::post('/login', [LoginController::class, 'store']);
+
+// Déconnexion (POST ou GET selon ton implémentation, POST est recommandé)
+Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
