@@ -32,6 +32,7 @@ class CouleurController extends Controller
     {
         $donnees = $request->validate([
             'marque_id' => ['required', 'exists:marques,id'],
+            'type' => ['required', 'string', 'max:50'], // Ajout du type (B6, B12...)
             'nom_couleur' => ['required', 'string', 'max:255'],
             'poids' => ['required', 'string', 'max:50'],
             'prix_unitaire' => ['required', 'integer', 'min:0'],
@@ -52,7 +53,7 @@ class CouleurController extends Controller
             }
         });
 
-        return redirect()->route('admin.couleurs.index')->with('succes', 'Couleur créée.');
+        return redirect()->route('admin.couleurs.index')->with('succes', 'Type / Bouteille créé.');
     }
 
     public function edit(Couleur $couleur): View
@@ -66,6 +67,7 @@ class CouleurController extends Controller
     {
         $donnees = $request->validate([
             'marque_id' => ['required', 'exists:marques,id'],
+            'type' => ['required', 'string', 'max:50'], // Ajout du type ici aussi
             'nom_couleur' => ['required', 'string', 'max:255'],
             'poids' => ['required', 'string', 'max:50'],
             'prix_unitaire' => ['required', 'integer', 'min:0'],
@@ -73,13 +75,13 @@ class CouleurController extends Controller
 
         $couleur->update($donnees);
 
-        return redirect()->route('admin.couleurs.index')->with('succes', 'Couleur mise à jour.');
+        return redirect()->route('admin.couleurs.index')->with('succes', 'Type / Bouteille mis à jour.');
     }
 
     public function destroy(Couleur $couleur): RedirectResponse
     {
         $couleur->delete();
 
-        return redirect()->route('admin.couleurs.index')->with('succes', 'Couleur supprimée.');
+        return redirect()->route('admin.couleurs.index')->with('succes', 'Type / Bouteille supprimé.');
     }
 }

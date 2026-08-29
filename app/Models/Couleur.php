@@ -13,6 +13,7 @@ class Couleur extends Model
 
     protected $fillable = [
         'marque_id',
+        'type',
         'nom_couleur',
         'poids',
         'prix_unitaire',
@@ -45,8 +46,8 @@ class Couleur extends Model
         return $this->hasMany(DemandeApprovisionnement::class);
     }
 
-    public function nomComplet(): string
-    {
-        return "{$this->marque->nom} {$this->nom_couleur} ({$this->poids})";
-    }
+public function nomComplet()
+{
+    return $this->marque->nom . ' - ' . $this->type . ' (' . $this->nom . ')';
+}
 }

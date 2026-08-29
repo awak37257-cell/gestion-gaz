@@ -6,20 +6,22 @@
     <title>@yield('titre', 'Administration')</title>
     <style>
         :root {
-            --couleur-primaire: #96692C;
-            --couleur-primaire-fonce: #7A5423;
-            --couleur-danger: #8C3A2B;
-            --couleur-fond: #F3F2EE;
+            --couleur-primaire: #8B5CF6;
+            --couleur-primaire-fonce: #6D28D9;
+            --couleur-danger: #EF4444;
+            --couleur-fond: #FAF8FC;
             --couleur-carte: #FFFFFF;
-            --couleur-texte: #1B1F1D;
-            --couleur-texte-clair: #6E7268;
-            --couleur-bordure: #DEDBD2;
-            --rayon: 4px;
+            --couleur-texte: #241F3D;
+            --couleur-texte-clair: #7A7390;
+            --couleur-bordure: #EBE6F5;
+            --rayon: 14px;
             --police-titre: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
             --police-chiffres: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            --degrade-primaire: linear-gradient(135deg, #B8863D 0%, #7A3B3E 100%);
-            --degrade-primaire-hover: linear-gradient(135deg, #A8763A 0%, #6B2E33 100%);
-            --degrade-danger: linear-gradient(135deg, #B14E3D 0%, #7A2A20 100%);
+            --degrade-primaire: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+            --degrade-primaire-hover: linear-gradient(135deg, #7C3AED 0%, #DB2777 100%);
+            --degrade-secondaire: linear-gradient(135deg, #EC4899 0%, #F97316 100%);
+            --degrade-tertiaire: linear-gradient(135deg, #06B6D4 0%, #8B5CF6 100%);
+            --degrade-danger: linear-gradient(135deg, #FB7185 0%, #EF4444 100%);
         }
 
         * { box-sizing: border-box; }
@@ -28,7 +30,9 @@
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background:
-                radial-gradient(circle at 100% 0%, rgba(184,134,61,0.05), transparent 45%),
+                radial-gradient(circle at 8% 0%, rgba(139,92,246,0.09), transparent 40%),
+                radial-gradient(circle at 92% 15%, rgba(236,72,153,0.07), transparent 40%),
+                radial-gradient(circle at 50% 100%, rgba(249,115,22,0.05), transparent 40%),
                 var(--couleur-fond);
             color: var(--couleur-texte);
             display: flex;
@@ -44,63 +48,104 @@
 
         .barre-laterale {
             width: 230px;
-            background: linear-gradient(180deg, #1B1F1D 0%, #262B27 100%);
+            background: linear-gradient(180deg, #241F3D 0%, #3B2A5E 100%);
             color: #fff;
             padding: 24px 0;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .barre-laterale h2 {
             font-family: var(--police-titre);
             font-size: 16px;
             font-weight: 600;
-            padding: 0 24px 18px;
-            margin: 0;
-            border-bottom: 1px solid rgba(255,255,255,0.12);
+            padding: 0 22px 18px;
+            margin: 0 12px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.14);
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .barre-laterale nav { display: flex; flex-direction: column; margin-top: 14px; }
+        .barre-laterale nav { display: flex; flex-direction: column; gap: 2px; padding: 0 12px; }
 
         .barre-laterale a {
             display: flex;
             align-items: center;
             gap: 11px;
-            color: rgba(255,255,255,0.65);
+            color: rgba(255,255,255,0.68);
             text-decoration: none;
-            padding: 11px 24px;
+            padding: 9px 14px;
             font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            border-left: 3px solid transparent;
-            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+            letter-spacing: 0.06em;
+            border-radius: 10px;
+            transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .barre-laterale a svg { flex-shrink: 0; opacity: 0.85; }
-
-        .barre-laterale a:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .barre-laterale a svg { flex-shrink: 0; opacity: 0.9; }
+        .barre-laterale a:hover { color: #fff; background: rgba(255,255,255,0.08); }
         .barre-laterale a.actif {
             color: #fff;
-            background: linear-gradient(90deg, rgba(184,134,61,0.22), rgba(122,59,62,0.08));
-            border-left-color: var(--couleur-primaire);
+            background: var(--degrade-primaire);
+            box-shadow: 0 4px 12px rgba(139,92,246,0.4);
         }
 
-        .barre-laterale form button {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.18);
-            color: rgba(255,255,255,0.85);
-            font-size: 11px;
+        .barre-laterale-profil {
+            margin-top: auto;
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.14);
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .profil-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--degrade-primaire);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .profil-details { flex: 1; min-width: 0; }
+        .profil-nom {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .profil-role {
+            font-size: 10.5px;
+            color: rgba(255,255,255,0.55);
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            cursor: pointer;
-            padding: 9px 14px;
-            border-radius: var(--rayon);
-            width: 100%;
+            letter-spacing: 0.05em;
         }
 
-        .barre-laterale form button:hover { background: rgba(255,255,255,0.16); color: #fff; }
+        .profil-deconnexion {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.85);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.15s ease;
+        }
+
+        .profil-deconnexion:hover { background: rgba(255,255,255,0.2); }
 
         .contenu { flex: 1; padding: 32px 40px; max-width: 1120px; }
 
@@ -114,17 +159,18 @@
         }
 
         .entete-page h1 { font-size: 22px; margin: 0; }
+        .entete-page-titre { display: flex; align-items: center; gap: 14px; }
 
         .message {
-            padding: 12px 14px;
-            border-radius: var(--rayon);
+            padding: 13px 16px;
+            border-radius: 12px;
             margin-bottom: 18px;
             font-size: 14px;
             border: 1px solid transparent;
         }
 
-        .message-succes { background: #F1F4EF; color: #3F6B4A; border-color: #D3DFCF; }
-        .message-erreur { background: #FBEEEB; color: var(--couleur-danger); border-color: #EAD1CB; }
+        .message-succes { background: #D1FAE5; color: #065F46; border-color: #A7F3D0; }
+        .message-erreur { background: #FEE2E2; color: #B91C1C; border-color: #FECACA; }
 
         .carte {
             background: var(--couleur-carte);
@@ -132,12 +178,11 @@
             border-radius: var(--rayon);
             padding: 22px;
             margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(27,31,29,0.05);
+            box-shadow: 0 2px 10px rgba(139,92,246,0.07);
             position: relative;
-            transition: box-shadow 0.15s ease;
         }
 
-        .carte-accent, .carte-accent-danger { padding-left: 26px; }
+        .carte-accent, .carte-accent-danger { padding-left: 27px; }
 
         .carte-accent::before, .carte-accent-danger::before {
             content: '';
@@ -150,11 +195,7 @@
         .carte-accent::before { background: var(--degrade-primaire); }
         .carte-accent-danger::before { background: var(--degrade-danger); }
 
-        .carte-stat {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
+        .carte-stat { display: flex; align-items: center; gap: 16px; }
 
         .icone-badge {
             width: 46px;
@@ -165,10 +206,12 @@
             justify-content: center;
             flex-shrink: 0;
             background: var(--degrade-primaire);
-            box-shadow: 0 3px 8px rgba(122,59,62,0.22);
+            box-shadow: 0 4px 12px rgba(139,92,246,0.32);
         }
 
-        .icone-badge.danger { background: var(--degrade-danger); box-shadow: 0 3px 8px rgba(122,42,32,0.22); }
+        .icone-badge-b { background: var(--degrade-secondaire); box-shadow: 0 4px 12px rgba(236,72,153,0.32); }
+        .icone-badge-c { background: var(--degrade-tertiaire); box-shadow: 0 4px 12px rgba(6,182,212,0.32); }
+        .icone-badge.danger { background: var(--degrade-danger); box-shadow: 0 4px 12px rgba(239,68,68,0.32); }
         .icone-badge svg { stroke: #fff; }
 
         .icone-badge-petit {
@@ -180,17 +223,15 @@
             justify-content: center;
             flex-shrink: 0;
             background: var(--degrade-primaire);
-            box-shadow: 0 2px 6px rgba(122,59,62,0.22);
+            box-shadow: 0 3px 9px rgba(139,92,246,0.3);
         }
 
         .icone-badge-petit svg { stroke: #fff; }
 
-        .entete-page-titre { display: flex; align-items: center; gap: 14px; }
-
         table { width: 100%; border-collapse: collapse; }
 
-        tbody tr:nth-child(even) { background: rgba(27,31,29,0.015); }
-        tbody tr:hover { background: #F7F5F0; }
+        tbody tr:nth-child(even) { background: rgba(139,92,246,0.025); }
+        tbody tr:hover { background: #F6F2FC; }
 
         th, td {
             text-align: left;
@@ -201,89 +242,87 @@
 
         th {
             color: var(--couleur-texte-clair);
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
             font-size: 11px;
             letter-spacing: 0.06em;
         }
 
-        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; }
 
         input, select {
             width: 100%;
-            max-width: 360px;
-            padding: 11px 14px;
-            font-size: 14px;
+            max-width: 380px;
+            padding: 13px 16px;
+            font-size: 14.5px;
             font-family: inherit;
-            border: 1.5px solid var(--couleur-bordure);
-            border-radius: 6px;
-            margin-bottom: 16px;
-            background: #FAFAF7;
-            transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+            border: 2px solid var(--couleur-bordure);
+            border-radius: 12px;
+            margin-bottom: 18px;
+            background: #FCFAFF;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
         }
+
+        input:hover, select:hover { border-color: #D9CFF0; }
 
         input:focus, select:focus {
             outline: none;
-            border-color: var(--couleur-primaire);
+            border-color: #8B5CF6;
             background: #fff;
-            box-shadow: 0 0 0 3px rgba(150,105,44,0.14);
+            box-shadow: 0 0 0 4px rgba(139,92,246,0.16);
         }
 
         select {
             appearance: none;
             -webkit-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236E7268' stroke-width='1.6'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238B5CF6' stroke-width='2'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 14px center;
-            padding-right: 36px;
+            background-position: right 16px center;
+            padding-right: 42px;
         }
 
         .bouton {
             display: inline-block;
-            padding: 10px 18px;
-            font-size: 12px;
-            font-weight: 600;
+            padding: 12px 22px;
+            font-size: 12.5px;
+            font-weight: 700;
             text-align: center;
-            border: 1.5px solid transparent;
-            border-radius: 6px;
+            border: 2px solid transparent;
+            border-radius: 999px;
             cursor: pointer;
             text-decoration: none;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+            letter-spacing: 0.05em;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         }
 
-        .bouton-primaire {
-            background: var(--degrade-primaire);
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(122,59,62,0.25);
-        }
-        .bouton-primaire:hover { background: var(--degrade-primaire-hover); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(122,59,62,0.32); }
+        .bouton-primaire { background: var(--degrade-primaire); color: #fff; box-shadow: 0 4px 14px rgba(139,92,246,0.35); }
+        .bouton-primaire:hover { background: var(--degrade-primaire-hover); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(139,92,246,0.42); }
 
         .bouton-secondaire { background: #fff; color: var(--couleur-texte); border-color: var(--couleur-bordure); }
-        .bouton-secondaire:hover { border-color: var(--couleur-primaire); background: #FAF7F2; }
+        .bouton-secondaire:hover { border-color: #8B5CF6; background: #FCFAFF; color: #6D28D9; }
 
-        .bouton-danger { background: #fff; color: var(--couleur-danger); border-color: #EAD1CB; }
-        .bouton-danger:hover { background: #FBEEEB; }
+        .bouton-danger { background: #fff; color: var(--couleur-danger); border-color: #FECACA; }
+        .bouton-danger:hover { background: #FEF2F2; }
 
-        .bouton-petit { padding: 6px 12px; font-size: 11px; }
+        .bouton-petit { padding: 7px 15px; font-size: 11px; }
 
-        .erreur-champ { color: var(--couleur-danger); font-size: 13px; margin-top: -12px; margin-bottom: 14px; }
+        .erreur-champ { color: var(--couleur-danger); font-size: 13px; margin-top: -14px; margin-bottom: 16px; }
 
         .badge {
             display: inline-block;
-            padding: 2px 8px;
-            border-radius: 2px;
+            padding: 3px 11px;
+            border-radius: 999px;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.03em;
         }
 
-        .badge-attente { background: #F7F1E6; color: #7A5423; border: 1px solid #E8DABF; }
-        .badge-validee { background: #EEF1F4; color: #3D5266; border: 1px solid #D6DEE5; }
-        .badge-livree { background: #F1F4EF; color: #3F6B4A; border: 1px solid #D3DFCF; }
-        .badge-inactif { background: #F1F0EC; color: #8A8D85; border: 1px solid var(--couleur-bordure); }
+        .badge-attente { background: #FEF3C7; color: #92400E; }
+        .badge-validee { background: #DBEAFE; color: #1E40AF; }
+        .badge-livree { background: #D1FAE5; color: #065F46; }
+        .badge-inactif { background: #F3F0FA; color: #8A80A8; }
 
         form.inline { display: inline; }
 
@@ -298,9 +337,9 @@
     <div class="barre-laterale">
         <h2>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="9" stroke="#96692C" stroke-width="1.6"/>
-                <line x1="12" y1="12" x2="16" y2="7" stroke="#96692C" stroke-width="1.6" stroke-linecap="round"/>
-                <circle cx="12" cy="12" r="1.6" fill="#96692C"/>
+                <circle cx="12" cy="12" r="9" stroke="#EC4899" stroke-width="1.8"/>
+                <line x1="12" y1="12" x2="16" y2="7" stroke="#EC4899" stroke-width="1.8" stroke-linecap="round"/>
+                <circle cx="12" cy="12" r="1.8" fill="#EC4899"/>
             </svg>
             Gestion Dépôt Gaz
         </h2>
@@ -339,10 +378,19 @@
             </a>
         </nav>
 
-        <form method="POST" action="{{ route('logout') }}" style="padding:0 24px;margin-top:24px;">
-            @csrf
-            <button type="submit">Déconnexion</button>
-        </form>
+        <div class="barre-laterale-profil">
+            <div class="profil-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+            <div class="profil-details">
+                <div class="profil-nom">{{ auth()->user()->name }}</div>
+                <div class="profil-role">Administrateur</div>
+            </div>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="profil-deconnexion" title="Déconnexion">
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2H3.5a1 1 0 00-1 1v10a1 1 0 001 1H6"/><path d="M10.5 11l3-3-3-3"/><path d="M13.5 8h-8"/></svg>
+                </button>
+            </form>
+        </div>
     </div>
 
     <div class="contenu">

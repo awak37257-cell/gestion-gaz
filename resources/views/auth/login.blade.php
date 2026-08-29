@@ -6,13 +6,13 @@
     <title>Connexion</title>
     <style>
         :root {
-            --couleur-primaire: #96692C;
-            --couleur-danger: #8C3A2B;
-            --couleur-fond: #F3F2EE;
-            --couleur-texte: #1B1F1D;
-            --couleur-texte-clair: #6E7268;
-            --couleur-bordure: #DEDBD2;
-            --rayon: 4px;
+            --couleur-primaire: #8B5CF6;
+            --couleur-danger: #EF4444;
+            --couleur-fond: #FAF8FC;
+            --couleur-texte: #241F3D;
+            --couleur-texte-clair: #7A7390;
+            --couleur-bordure: #EBE6F5;
+            --rayon: 16px;
             --police-titre: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
         }
 
@@ -22,10 +22,11 @@
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background:
-                radial-gradient(circle at 15% 15%, rgba(184,134,61,0.10), transparent 45%),
-                radial-gradient(circle at 85% 85%, rgba(122,59,62,0.08), transparent 45%),
-                var(--couleur-fond);
-            color: var(--couleur-texte);
+                radial-gradient(circle at 15% 15%, rgba(139,92,246,0.12), transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(236,72,153,0.10), transparent 45%),
+                radial-gradient(circle at 85% 15%, rgba(249,115,22,0.06), transparent 40%),
+                #FAF8FC;
+            color: #241F3D;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -62,54 +63,55 @@
 
         input {
             width: 100%;
-            padding: 13px 14px;
+            padding: 13px 16px;
             font-size: 15px;
             font-family: inherit;
-            border: 1.5px solid var(--couleur-bordure);
-            border-radius: 6px;
-            margin-bottom: 16px;
-            background: #FAFAF7;
-            transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+            border: 2px solid var(--couleur-bordure);
+            border-radius: 12px;
+            margin-bottom: 18px;
+            background: #FCFAFF;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
         }
 
         input:focus {
             outline: none;
-            border-color: var(--couleur-primaire);
+            border-color: #8B5CF6;
             background: #fff;
-            box-shadow: 0 0 0 3px rgba(150,105,44,0.14);
+            box-shadow: 0 0 0 4px rgba(139,92,246,0.16);
         }
 
         .bouton {
             display: block;
             width: 100%;
-            padding: 13px;
+            padding: 14px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             text-align: center;
             border: none;
-            border-radius: 6px;
+            border-radius: 999px;
             cursor: pointer;
-            background: linear-gradient(135deg, #B8863D 0%, #7A3B3E 100%);
+            background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
             color: #fff;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            box-shadow: 0 3px 10px rgba(122,59,62,0.28);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 4px 14px rgba(139,92,246,0.35);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
         }
 
         .bouton:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 14px rgba(122,59,62,0.34);
+            background: linear-gradient(135deg, #7C3AED 0%, #DB2777 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(139,92,246,0.42);
         }
 
         .erreur {
-            color: var(--couleur-danger);
+            color: #B91C1C;
             font-size: 13px;
             margin-bottom: 16px;
-            padding: 10px 12px;
-            background: #FBEEEB;
-            border: 1px solid #EAD1CB;
-            border-radius: var(--rayon);
+            padding: 10px 14px;
+            background: #FEE2E2;
+            border: 1px solid #FECACA;
+            border-radius: 12px;
         }
     </style>
 </head>

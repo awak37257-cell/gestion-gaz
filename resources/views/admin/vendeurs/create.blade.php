@@ -12,25 +12,31 @@
         </div>
     </div>
 
-    <div class="carte">
+    <div class="carte" style="max-width: 600px;">
         <form method="POST" action="{{ route('admin.vendeurs.store') }}">
             @csrf
 
-            <label for="depot_id">Dépôt</label>
-            <select name="depot_id" id="depot_id" required>
-                <option value="">— Choisir —</option>
-                @foreach ($depots as $depot)
-                    <option value="{{ $depot->id }}" @selected(old('depot_id') == $depot->id)>{{ $depot->nom }}</option>
-                @endforeach
-            </select>
-            @error('depot_id')<div class="erreur-champ">{{ $message }}</div>@enderror
+            <div style="margin-bottom: 16px;">
+                <label for="depot_id">Dépôt</label>
+                <select name="depot_id" id="depot_id" required style="max-width: 100%;">
+                    <option value="">— Choisir —</option>
+                    @foreach ($depots as $depot)
+                        <option value="{{ $depot->id }}" @selected(old('depot_id') == $depot->id)>{{ $depot->nom }}</option>
+                    @endforeach
+                </select>
+                @error('depot_id')<div class="erreur-champ">{{ $message }}</div>@enderror
+            </div>
 
-            <label for="nom">Nom</label>
-            <input type="text" name="nom" id="nom" value="{{ old('nom') }}" required>
-            @error('nom')<div class="erreur-champ">{{ $message }}</div>@enderror
+            <div style="margin-bottom: 24px;">
+                <label for="nom">Nom du vendeur</label>
+                <input type="text" name="nom" id="nom" value="{{ old('nom') }}" placeholder="ex : Jean Dupont" required style="max-width: 100%;">
+                @error('nom')<div class="erreur-champ">{{ $message }}</div>@enderror
+            </div>
 
-            <button type="submit" class="bouton bouton-primaire">Créer (génère le QR)</button>
-            <a href="{{ route('admin.vendeurs.index') }}" class="bouton bouton-secondaire">Annuler</a>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button type="submit" class="bouton bouton-primaire" style="width: auto; padding: 10px 24px; margin-top: 0;">Créer (génère le QR)</button>
+                <a href="{{ route('admin.vendeurs.index') }}" class="bouton bouton-secondaire" style="width: auto; padding: 10px 20px; margin-top: 0; text-decoration: none;">Annuler</a>
+            </div>
         </form>
     </div>
 @endsection
