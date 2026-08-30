@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\ClientScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,12 +13,22 @@ class Couleur extends Model
     use HasFactory;
 
     protected $fillable = [
+        'client_id',
         'marque_id',
-        'type',
         'nom_couleur',
         'poids',
         'prix_unitaire',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new ClientScope);
+    }
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
 
     public function marque(): BelongsTo
     {
@@ -46,8 +57,8 @@ class Couleur extends Model
         return $this->hasMany(DemandeApprovisionnement::class);
     }
 
-public function nomComplet()
-{
-    return $this->marque->nom . ' - ' . $this->type . ' (' . $this->nom . ')';
-}
+    public function nomComplet(): string
+    {
+        return "{$this->marque->nom} {$this->nom_couleur} ({$this->poids})";
+    }
 }

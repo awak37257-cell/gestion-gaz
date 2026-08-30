@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\ClientScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,7 @@ class DemandeApprovisionnement extends Model
     protected $table = 'demandes_approvisionnements';
 
     protected $fillable = [
+        'client_id',
         'vendeur_id',
         'marque_id',
         'couleur_id',
@@ -24,6 +26,16 @@ class DemandeApprovisionnement extends Model
     protected $casts = [
         'date' => 'date',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new ClientScope);
+    }
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
 
     public function vendeur(): BelongsTo
     {

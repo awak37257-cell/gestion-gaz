@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\ClientScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,7 @@ class InventaireLigne extends Model
     use HasFactory;
 
     protected $fillable = [
+        'client_id',
         'inventaire_id',
         'couleur_id',
         'quantite_pleines_comptee',
@@ -18,6 +20,16 @@ class InventaireLigne extends Model
         'quantite_pleines_theorique',
         'quantite_vides_theorique',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new ClientScope);
+    }
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
 
     public function inventaire(): BelongsTo
     {
