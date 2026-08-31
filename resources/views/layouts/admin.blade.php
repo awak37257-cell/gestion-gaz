@@ -171,6 +171,7 @@
 
         .message-succes { background: #D1FAE5; color: #065F46; border-color: #A7F3D0; }
         .message-erreur { background: #FEE2E2; color: #B91C1C; border-color: #FECACA; }
+        .message-info { background: #EDE9FE; color: #5B21B6; border-color: #DDD6FE; }
 
         .carte {
             background: var(--couleur-carte);
@@ -382,7 +383,7 @@
             <div class="profil-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
             <div class="profil-details">
                 <div class="profil-nom">{{ auth()->user()->name }}</div>
-                <div class="profil-role">Administrateur</div>
+                <div class="profil-role">{{ auth()->user()->client->nom }}</div>
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -394,6 +395,16 @@
     </div>
 
     <div class="contenu">
+        @if (session('impersonateur_id'))
+            <div class="message message-info" style="display:flex;justify-content:space-between;align-items:center;">
+                <span>Vous êtes connecté en tant que <strong>{{ auth()->user()->client->nom }}</strong>.</span>
+                <form method="POST" action="{{ route('impersonation.quitter') }}">
+                    @csrf
+                    <button type="submit" class="bouton bouton-secondaire bouton-petit">← Revenir au super-admin</button>
+                </form>
+            </div>
+        @endif
+
         @if (session('succes'))
             <div class="message message-succes">{{ session('succes') }}</div>
         @endif

@@ -37,6 +37,7 @@ class InventaireController extends Controller
 
         $inventaire = DB::transaction(function () use ($vendeur, $donnees) {
             $inventaire = Inventaire::create([
+                'client_id' => $vendeur->client_id,
                 'vendeur_id' => $vendeur->id,
                 'depot_id' => $vendeur->depot_id,
                 'date_heure' => now(),
@@ -49,6 +50,7 @@ class InventaireController extends Controller
                     ->first();
 
                 InventaireLigne::create([
+                    'client_id' => $vendeur->client_id,
                     'inventaire_id' => $inventaire->id,
                     'couleur_id' => $compte['couleur_id'],
                     'quantite_pleines_comptee' => $compte['quantite_pleines_comptee'],

@@ -33,12 +33,16 @@ class DepotController extends Controller
         ]);
 
         DB::transaction(function () use ($donnees) {
-            $depot = Depot::create($donnees);
+            $depot = Depot::create([
+                'client_id' => auth()->user()->client_id,
+                ...$donnees,
+            ]);
 
             // Une ligne de stock à 0 est créée pour chaque couleur existante,
             // pour que le nouveau dépôt démarre avec un inventaire complet.
             foreach (Couleur::all() as $couleur) {
                 Stock::create([
+                    'client_id' => auth()->user()->client_id,
                     'couleur_id' => $couleur->id,
                     'depot_id' => $depot->id,
                     'quantite_pleines' => 0,

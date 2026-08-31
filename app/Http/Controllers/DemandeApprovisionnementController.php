@@ -29,6 +29,7 @@ class DemandeApprovisionnementController extends Controller
         ]);
 
         DemandeApprovisionnement::create([
+            'client_id' => $vendeur->client_id,
             'vendeur_id' => $vendeur->id,
             'marque_id' => $donnees['marque_id'],
             'couleur_id' => $donnees['couleur_id'],

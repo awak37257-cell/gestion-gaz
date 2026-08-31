@@ -13,8 +13,10 @@ use App\Http\Controllers\Admin\VendeurController as AdminVendeurController;
 use App\Http\Controllers\Admin\InventaireController as AdminInventaireController;
 use App\Http\Controllers\InventaireController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\SuperAdmin\ClientController as SuperAdminClientController;
+use App\Http\Controllers\SuperAdmin\ImpersonationController;
 
-Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+Route::middleware('client.actif')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('depots', DepotController::class)->except('show');
@@ -30,6 +32,19 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::patch('/demandes/{demande}/livrer', [AdminDemandeController::class, 'livrer'])->name('demandes.livrer');
     Route::get('/inventaires', [AdminInventaireController::class, 'index'])->name('inventaires.index');
 });
+Route::middleware(['auth', 'super-admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
+    Route::get('/clients/export', [SuperAdminClientController::class, 'exporter'])->name('clients.exporter');
+    Route::resource('clients', SuperAdminClientController::class);
+    Route::patch('/clients/{client}/renouveler', [SuperAdminClientController::class, 'renouveler'])->name('clients.renouveler');
+    Route::patch('/clients/{client}/basculer-statut', [SuperAdminClientController::class, 'basculerStatut'])->name('clients.basculer-statut');
+    Route::post('/clients/{client}/reinitialiser-mot-de-passe', [SuperAdminClientController::class, 'reinitialiserMotDePasse'])->name('clients.reinitialiser-mot-de-passe');
+    Route::post('/clients/{client}/paiements', [SuperAdminClientController::class, 'enregistrerPaiement'])->name('clients.paiements.store');
+    Route::post('/clients/{client}/impersonner', [ImpersonationController::class, 'demarrer'])->name('clients.impersonner');
+});
+
+Route::post('/impersonation/quitter', [ImpersonationController::class, 'quitter'])
+    ->name('impersonation.quitter')
+    ->middleware('auth');
 // Accès via QR code personnel du vendeur
 Route::get('/vendeur/scan/{tokenQr}', [VendeurAccessController::class, 'scan'])->name('vendeur.scan');
 

@@ -36,6 +36,11 @@ class Client extends Model
         return $this->hasMany(Depot::class);
     }
 
+    public function paiements(): HasMany
+    {
+        return $this->hasMany(Paiement::class);
+    }
+
     // Un abonnement est expiré si la date de fin est dépassée, même si le
     // statut en base n'a pas encore été mis à jour par une tâche planifiée.
     public function estActif(): bool

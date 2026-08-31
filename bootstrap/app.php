@@ -12,9 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
 ->withMiddleware(function (Middleware $middleware) {
-    $middleware->alias([
-        'vendeur.connecte' => \App\Http\Middleware\EnsureVendeurConnecte::class,
-    ]);
+  $middleware->alias([
+    'vendeur.connecte' => \App\Http\Middleware\EnsureVendeurConnecte::class,
+    'super-admin' => \App\Http\Middleware\EnsureIsSuperAdmin::class,
+    'client.actif' => \App\Http\Middleware\EnsureIsClientAdmin::class,
+]);
 })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

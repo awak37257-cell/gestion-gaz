@@ -34,6 +34,7 @@ class VendeurController extends Controller
         ]);
 
         $vendeur = Vendeur::create([
+            'client_id' => auth()->user()->client_id,
             ...$donnees,
             'token_qr' => Str::random(32),
             'actif' => true,

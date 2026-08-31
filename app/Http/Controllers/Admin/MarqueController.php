@@ -7,6 +7,7 @@ use App\Models\Marque;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class MarqueController extends Controller
 {
@@ -25,10 +26,16 @@ class MarqueController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $donnees = $request->validate([
-            'nom' => ['required', 'string', 'max:255', 'unique:marques,nom'],
+            'nom' => [
+                'required', 'string', 'max:255',
+                Rule::unique('marques', 'nom')->where('client_id', auth()->user()->client_id),
+            ],
         ]);
 
-        Marque::create($donnees);
+        Marque::create([
+            'client_id' => auth()->user()->client_id,
+            ...$donnees,
+        ]);
 
         return redirect()->route('admin.marques.index')->with('succes', 'Marque créée.');
     }
@@ -41,7 +48,10 @@ class MarqueController extends Controller
     public function update(Request $request, Marque $marque): RedirectResponse
     {
         $donnees = $request->validate([
-            'nom' => ['required', 'string', 'max:255', 'unique:marques,nom,' . $marque->id],
+            'nom' => [
+                'required', 'string', 'max:255',
+                Rule::unique('marques', 'nom')->where('client_id', auth()->user()->client_id)->ignore($marque->id),
+            ],
         ]);
 
         $marque->update($donnees);

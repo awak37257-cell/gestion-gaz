@@ -57,6 +57,7 @@ class VenteController extends Controller
             $couleurVendue = Couleur::findOrFail($donnees['couleur_vendue_id']);
 
             return Vente::create([
+                'client_id' => $vendeur->client_id,
                 'vendeur_id' => $vendeur->id,
                 'couleur_vendue_id' => $donnees['couleur_vendue_id'],
                 'couleur_demandee_id' => $donnees['changement_effectue'] ? $donnees['couleur_demandee_id'] : null,

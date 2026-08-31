@@ -32,19 +32,22 @@ class CouleurController extends Controller
     {
         $donnees = $request->validate([
             'marque_id' => ['required', 'exists:marques,id'],
-            'type' => ['required', 'string', 'max:50'], // Ajout du type (B6, B12...)
             'nom_couleur' => ['required', 'string', 'max:255'],
             'poids' => ['required', 'string', 'max:50'],
             'prix_unitaire' => ['required', 'integer', 'min:0'],
         ]);
 
         DB::transaction(function () use ($donnees) {
-            $couleur = Couleur::create($donnees);
+            $couleur = Couleur::create([
+                'client_id' => auth()->user()->client_id,
+                ...$donnees,
+            ]);
 
             // Une ligne de stock à 0 est créée pour chaque dépôt existant,
             // pour que la nouvelle couleur apparaisse partout sans étape manuelle.
             foreach (Depot::all() as $depot) {
                 Stock::create([
+                    'client_id' => auth()->user()->client_id,
                     'couleur_id' => $couleur->id,
                     'depot_id' => $depot->id,
                     'quantite_pleines' => 0,
@@ -53,7 +56,7 @@ class CouleurController extends Controller
             }
         });
 
-        return redirect()->route('admin.couleurs.index')->with('succes', 'Type / Bouteille créé.');
+        return redirect()->route('admin.couleurs.index')->with('succes', 'Couleur créée.');
     }
 
     public function edit(Couleur $couleur): View
@@ -67,7 +70,6 @@ class CouleurController extends Controller
     {
         $donnees = $request->validate([
             'marque_id' => ['required', 'exists:marques,id'],
-            'type' => ['required', 'string', 'max:50'], // Ajout du type ici aussi
             'nom_couleur' => ['required', 'string', 'max:255'],
             'poids' => ['required', 'string', 'max:50'],
             'prix_unitaire' => ['required', 'integer', 'min:0'],
@@ -75,13 +77,13 @@ class CouleurController extends Controller
 
         $couleur->update($donnees);
 
-        return redirect()->route('admin.couleurs.index')->with('succes', 'Type / Bouteille mis à jour.');
+        return redirect()->route('admin.couleurs.index')->with('succes', 'Couleur mise à jour.');
     }
 
     public function destroy(Couleur $couleur): RedirectResponse
     {
         $couleur->delete();
 
-        return redirect()->route('admin.couleurs.index')->with('succes', 'Type / Bouteille supprimé.');
+        return redirect()->route('admin.couleurs.index')->with('succes', 'Couleur supprimée.');
     }
 }
