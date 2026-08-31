@@ -68,7 +68,13 @@
             gap: 10px;
         }
 
-        .barre-laterale nav { display: flex; flex-direction: column; gap: 2px; padding: 0 12px; }
+        /* Espacement corrigé et aéré ici */
+        .barre-laterale nav { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            padding: 0 12px; 
+        }
 
         .barre-laterale a {
             display: flex;
@@ -76,7 +82,7 @@
             gap: 11px;
             color: rgba(255,255,255,0.68);
             text-decoration: none;
-            padding: 9px 14px;
+            padding: 11px 14px; /* Hauteur légèrement augmentée pour un meilleur confort visuel */
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.06em;
@@ -344,6 +350,7 @@
             </svg>
             Gestion Dépôt Gaz
         </h2>
+        
         <nav>
             <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'actif' : '' }}">
                 <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="0.5"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="0.5"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="0.5"/><rect x="9" y="9" width="5.5" height="5.5" rx="0.5"/></svg>
@@ -376,6 +383,14 @@
             <a href="{{ route('admin.inventaires.index') }}" class="{{ request()->routeIs('admin.inventaires.*') ? 'actif' : '' }}">
                 <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="2" width="11" height="12" rx="0.5"/><path d="M5 6.5l1 1 2-2M5 11l1 1 2-2"/><path d="M10 6.5h3M10 11h3"/></svg>
                 Inventaires
+            </a>
+
+            <!-- Ligne de séparation discrète pour isoler les paramètres -->
+            <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 6px 0;"></div>
+
+            <a href="{{ route('admin.parametres.index') }}" class="{{ request()->routeIs('admin.parametres.*') ? 'actif' : '' }}">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.2"/><path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M3.05 12.95l1.06-1.06M11.89 4.11l1.06-1.06"/></svg>
+                Paramètres
             </a>
         </nav>
 

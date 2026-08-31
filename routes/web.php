@@ -15,7 +15,11 @@ use App\Http\Controllers\InventaireController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SuperAdmin\ClientController as SuperAdminClientController;
 use App\Http\Controllers\SuperAdmin\ImpersonationController;
+use App\Http\Controllers\Admin\ParametreController;
 
+Route::get('/', function () {
+    return view('welcome');
+});
 Route::middleware('client.actif')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
@@ -31,6 +35,8 @@ Route::middleware('client.actif')->prefix('admin')->name('admin.')->group(functi
     Route::patch('/demandes/{demande}/valider', [AdminDemandeController::class, 'valider'])->name('demandes.valider');
     Route::patch('/demandes/{demande}/livrer', [AdminDemandeController::class, 'livrer'])->name('demandes.livrer');
     Route::get('/inventaires', [AdminInventaireController::class, 'index'])->name('inventaires.index');
+Route::get('/parametres', [ParametreController::class, 'index'])->name('parametres.index');
+    Route::put('/parametres', [ParametreController::class, 'update'])->name('parametres.update');
 });
 Route::middleware(['auth', 'super-admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
     Route::get('/clients/export', [SuperAdminClientController::class, 'exporter'])->name('clients.exporter');
@@ -65,6 +71,10 @@ Route::get('/inventaires/{inventaire}', [InventaireController::class, 'show'])->
 
     });
     // Afficher le formulaire de connexion (GET)
+Route::get('/presentation', function () {
+    return view('presentation');
+})->name('presentation');
+
 Route::get('/login', [LoginController::class, 'create'])->name('login');
 
 // Traiter la connexion (POST)

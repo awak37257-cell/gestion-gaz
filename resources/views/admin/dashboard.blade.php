@@ -3,8 +3,9 @@
 @section('titre', 'Tableau de bord')
 
 @section('content')
-    <div class="entete-page">
+    <div class="entete-page" style="display: flex; justify-content: space-between; align-items: center;">
         <h1>Tableau de bord</h1>
+
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px;">
