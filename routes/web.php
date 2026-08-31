@@ -13,13 +13,20 @@ use App\Http\Controllers\Admin\VendeurController as AdminVendeurController;
 use App\Http\Controllers\Admin\InventaireController as AdminInventaireController;
 use App\Http\Controllers\InventaireController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\DemandeAccesController;
 use App\Http\Controllers\SuperAdmin\ClientController as SuperAdminClientController;
+use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
+use App\Http\Controllers\SuperAdmin\DemandeAccesController as SuperAdminDemandeAccesController;
 use App\Http\Controllers\SuperAdmin\ImpersonationController;
+use App\Http\Controllers\SuperAdmin\PaiementController as SuperAdminPaiementController;
 use App\Http\Controllers\Admin\ParametreController;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
+
+Route::post('/demande-acces', [DemandeAccesController::class, 'store'])->name('demande-acces.store');
+
 Route::middleware('client.actif')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
@@ -39,6 +46,16 @@ Route::get('/parametres', [ParametreController::class, 'index'])->name('parametr
     Route::put('/parametres', [ParametreController::class, 'update'])->name('parametres.update');
 });
 Route::middleware(['auth', 'super-admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
+    Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/paiements', [SuperAdminPaiementController::class, 'index'])->name('paiements.index');
+
+    // Gestion des demandes d'accès publiques
+    Route::get('/demandes-acces', [SuperAdminDemandeAccesController::class, 'index'])->name('demandes.index');
+    Route::post('/demandes-acces/{demande}/valider', [SuperAdminDemandeAccesController::class, 'valider'])->name('demandes.valider');
+    Route::post('/demandes-acces/{demande}/rejeter', [SuperAdminDemandeAccesController::class, 'rejeter'])->name('demandes.rejeter');
+    Route::delete('/demandes-acces/{demande}', [SuperAdminDemandeAccesController::class, 'destroy'])->name('demandes.destroy');
+
+    // Gestion des clients
     Route::get('/clients/export', [SuperAdminClientController::class, 'exporter'])->name('clients.exporter');
     Route::resource('clients', SuperAdminClientController::class);
     Route::patch('/clients/{client}/renouveler', [SuperAdminClientController::class, 'renouveler'])->name('clients.renouveler');

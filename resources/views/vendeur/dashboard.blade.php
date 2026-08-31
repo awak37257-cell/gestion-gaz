@@ -1,62 +1,94 @@
 @extends('layouts.vendeur')
 
-@section('titre', 'Tableau de bord')
+@section('titre', 'Tableau de bord Vendeur')
 
 @section('content')
-    <div class="carte carte-accent" style="text-align:center;">
-        <div style="width:46px;height:46px;border-radius:50%;background:var(--degrade-primaire);box-shadow:0 3px 10px rgba(122,59,62,0.25);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><path d="M3 17l5-5 4 4 8-9"/><path d="M15 7h5v5"/></svg>
+    <!-- KPI Ventes du jour -->
+    <div class="carte" style="text-align:center;background:linear-gradient(135deg, #1e293b, #0f172a);color:#fff;border:1px solid #334155;">
+        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:0.25rem;">
+            Ventes Réalisées Aujourd'hui
         </div>
-        <div style="font-size:12px;color:var(--couleur-texte-clair);text-transform:uppercase;letter-spacing:0.05em;">Ventes aujourd'hui</div>
-        <div style="font-size:42px;font-weight:700;color:var(--couleur-primaire);font-family:var(--police-chiffres);">{{ $nombreVentes }}</div>
+        <div style="font-size:3.2rem;font-weight:900;color:var(--primary);font-family:'Outfit',sans-serif;line-height:1;">
+            {{ $nombreVentes }}
+        </div>
+        <div style="font-size:0.8rem;color:#94a3b8;margin-top:0.3rem;">
+            Bouteille(s) de gaz vendue(s)
+        </div>
     </div>
 
-    <a href="{{ route('vendeur.ventes.create') }}" class="bouton bouton-primaire">Nouvelle vente</a>
-    <a href="{{ route('vendeur.demandes.create') }}" class="bouton bouton-secondaire">Nouvelle demande d'approvisionnement</a>
-    <a href="{{ route('vendeur.inventaires.create') }}" class="bouton bouton-secondaire">Faire l'inventaire</a>
+    <!-- Actions Rapides Tactiles -->
+    <a href="{{ route('vendeur.ventes.create') }}" class="btn-action-big primary-action">
+        <div class="btn-action-icon">⚡</div>
+        <div style="flex:1;">
+            <div style="font-size:1.1rem;font-weight:800;">+ Nouvelle Vente</div>
+            <div style="font-size:0.75rem;opacity:0.9;">Encaisser et imprimer un reçu</div>
+        </div>
+        <div>➔</div>
+    </a>
 
-    <div class="carte" style="margin-top:20px;">
-        <h3 style="margin-top:0;">Ventes du jour</h3>
-        @forelse ($ventesDuJour as $vente)
-            <div style="padding:10px 0;border-bottom:1px solid #eee;">
-                <strong>{{ $vente->couleurVendue->nomComplet() }}</strong> × {{ $vente->quantite }}
-                <div style="font-size:12px;color:var(--couleur-texte-clair);">
-                    {{ $vente->date_heure->format('H:i') }}
-                    @if ($vente->estSubstitution())
-                        <span class="badge badge-changement">Changement</span>
-                    @endif
-                </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.25rem;">
+        <a href="{{ route('vendeur.demandes.create') }}" class="btn-action-big" style="margin-bottom:0;padding:1rem;flex-direction:column;align-items:flex-start;gap:0.5rem;">
+            <div class="btn-action-icon" style="width:36px;height:36px;font-size:1.1rem;">🚚</div>
+            <div>
+                <div style="font-size:0.88rem;font-weight:800;">Réassort</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);">Demander du stock</div>
             </div>
-        @empty
-            <p style="color:var(--couleur-texte-clair);">Aucune vente enregistrée pour le moment.</p>
-        @endforelse
+        </a>
+
+        <a href="{{ route('vendeur.inventaires.create') }}" class="btn-action-big" style="margin-bottom:0;padding:1rem;flex-direction:column;align-items:flex-start;gap:0.5rem;">
+            <div class="btn-action-icon" style="width:36px;height:36px;font-size:1.1rem;">📋</div>
+            <div>
+                <div style="font-size:0.88rem;font-weight:800;">Inventaire</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);">Compter les bouteilles</div>
+            </div>
+        </a>
     </div>
 
-    @if ($changementsEffectues->isNotEmpty())
-        <div class="carte">
-            <h3 style="margin-top:0;">Changements effectués aujourd'hui</h3>
-            @foreach ($changementsEffectues as $changement)
-                <div style="padding:10px 0;border-bottom:1px solid #eee;font-size:14px;">
-                    {{ $changement->couleurDemandee->nomComplet() }} → {{ $changement->couleurVendue->nomComplet() }}
-                    <span style="color:var(--couleur-texte-clair);">× {{ $changement->quantite }}</span>
-                </div>
-            @endforeach
-        </div>
-    @endif
-
+    <!-- Ventes du jour -->
     <div class="carte">
-        <h3 style="margin-top:0;">Demandes en attente</h3>
-        @forelse ($demandesEnAttente as $demande)
-            <div style="padding:10px 0;border-bottom:1px solid #eee;font-size:14px;">
-                {{ $demande->marque->nom }} — {{ $demande->couleur->nom_couleur }} ({{ $demande->couleur->poids }}) × {{ $demande->quantite_demandee }}
+        <h3 style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;margin-bottom:0.75rem;color:var(--text-main);">
+            📜 Dernières ventes du jour
+        </h3>
+        @forelse ($ventesDuJour as $vente)
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #f1f5f9;">
+                <div>
+                    <div style="font-weight:700;font-size:0.9rem;">{{ $vente->couleurVendue->nomComplet() }}</div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);">
+                        Heure : {{ $vente->date_heure->format('H:i') }}
+                        @if ($vente->estSubstitution())
+                            • <span style="color:#f59e0b;font-weight:700;">Changement</span>
+                        @endif
+                    </div>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:1rem;color:var(--primary);">
+                    × {{ $vente->quantite }}
+                </div>
             </div>
         @empty
-            <p style="color:var(--couleur-texte-clair);">Aucune demande en attente.</p>
+            <p style="color:var(--text-muted);font-size:0.85rem;padding:0.5rem 0;text-align:center;">
+                Aucune vente enregistrée pour le moment aujourd'hui.
+            </p>
         @endforelse
     </div>
 
-    <form method="POST" action="{{ route('vendeur.deconnexion') }}" style="margin-top:10px;">
-        @csrf
-        <button type="submit" class="bouton bouton-danger">Fin de service</button>
-    </form>
+    <!-- Demandes en attente -->
+    <div class="carte">
+        <h3 style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;margin-bottom:0.75rem;color:var(--text-main);">
+            🚚 Vos demandes d'approvisionnement
+        </h3>
+        @forelse ($demandesEnAttente as $demande)
+            <div style="padding:0.6rem 0;border-bottom:1px solid #f1f5f9;font-size:0.85rem;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <strong>{{ $demande->marque->nom }}</strong> — {{ $demande->couleur->nom_couleur }}
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--primary);">
+                    × {{ $demande->quantite_demandee }}
+                </div>
+            </div>
+        @empty
+            <p style="color:var(--text-muted);font-size:0.85rem;padding:0.5rem 0;text-align:center;">
+                Aucune demande en cours.
+            </p>
+        @endforelse
+    </div>
 @endsection

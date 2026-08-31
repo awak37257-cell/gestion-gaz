@@ -31,7 +31,7 @@ class LoginController extends Controller
         $request->session()->regenerate();
 
         if (auth()->user()->estSuperAdmin()) {
-            return redirect()->intended(route('super-admin.clients.index'));
+            return redirect()->intended(route('super-admin.dashboard'));
         }
 
         return redirect()->intended(route('admin.dashboard'));

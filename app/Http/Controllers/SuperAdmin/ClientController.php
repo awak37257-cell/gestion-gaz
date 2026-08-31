@@ -4,7 +4,6 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
-use App\Models\Paiement;
 use App\Models\User;
 use App\Models\Vente;
 use Carbon\Carbon;
@@ -16,75 +15,47 @@ use Illuminate\Support\Str;
 
 class ClientController extends Controller
 {
-    public function index(Request $request): View
-    {
-        $recherche = $request->string('recherche')->trim()->toString();
-        $statutFiltre = $request->string('statut')->toString();
+ public function index(Request $request): View
+{
+    $recherche = $request->string('recherche')->trim()->toString();
+    $statutFiltre = $request->string('statut')->toString();
 
-        $clients = Client::withCount(['depots', 'users'])
-            ->when($recherche, fn ($q) => $q->where('nom', 'like', "%{$recherche}%"))
-            ->when($statutFiltre, fn ($q) => $q->where('statut', $statutFiltre))
-            ->latest()
-            ->get();
+    $clients = Client::withCount(['depots', 'users'])
+        ->when($recherche, fn ($q) => $q->where('nom', 'like', "%{$recherche}%"))
+        ->when($statutFiltre, fn ($q) => $q->where('statut', $statutFiltre))
+        ->latest()
+        ->get();
 
-        $clientsActifs = $clients->where('statut', 'actif')->count();
+    // Calcul des statistiques pour les cartes du haut
+    $clientsActifs = $clients->where('statut', 'actif')->count();
+    $mrr = $clients->where('statut', 'actif')->sum('prix_abonnement');
+    
+    $expirationProche = $clients->filter(function ($client) {
+        return isset($client->date_expiration) && 
+               \Carbon\Carbon::parse($client->date_expiration)->isBetween(now(), now()->addDays(30));
+    })->count();
 
-        // Revenu mensuel récurrent : on ramène chaque abonnement à son
-        // équivalent mensuel pour pouvoir les additionner entre eux.
-        $mrr = $clients->where('statut', 'actif')->sum(function ($client) {
-            return match ($client->periode_abonnement) {
-                'mensuel' => $client->montant_abonnement,
-                'trimestriel' => $client->montant_abonnement / 3,
-                'annuel' => $client->montant_abonnement / 12,
-            };
-        });
+    // Calcul du total des dépôts sur l'ensemble des clients chargés (ou via la relation/somme des depots_count)
+    $totalDepots = $clients->sum('depots_count');
 
-        $expirationProche = $clients->filter(function ($client) {
-            return $client->statut === 'actif'
-                && $client->date_fin_abonnement->isFuture()
-                && now()->diffInDays($client->date_fin_abonnement) <= 30;
-        })->count();
-
-        $totalDepots = $clients->sum('depots_count');
-
-        // Dernière vente enregistrée et nombre de ventes ce mois-ci, par
-        // client — repère un client qui a arrêté d'utiliser le logiciel.
-        foreach ($clients as $client) {
-            $client->derniere_activite = Vente::where('client_id', $client->id)->max('date_heure');
-            $client->ventes_ce_mois = Vente::where('client_id', $client->id)
-                ->whereMonth('date_heure', now()->month)
-                ->whereYear('date_heure', now()->year)
-                ->count();
-        }
-
-        // Revenus encaissés (paiements) sur les 6 derniers mois, pour le graphique.
-        $paiementsRecents = Paiement::where('date_paiement', '>=', now()->subMonths(5)->startOfMonth())->get();
-
-        $revenusParMois = collect(range(5, 0))->map(function ($moisAvant) use ($paiementsRecents) {
-            $mois = now()->subMonths($moisAvant);
-
-            return [
-                'label' => $mois->translatedFormat('M Y'),
-                'total' => $paiementsRecents->filter(fn ($p) => $p->date_paiement->isSameMonth($mois))->sum('montant'),
-            ];
-        });
-
-        return view('super-admin.clients.index', compact(
-            'clients',
-            'clientsActifs',
-            'mrr',
-            'expirationProche',
-            'totalDepots',
-            'recherche',
-            'statutFiltre',
-            'revenusParMois',
-        ));
+    foreach ($clients as $client) {
+        $client->derniere_activite = Vente::where('client_id', $client->id)->max('date_heure');
+        $client->ventes_ce_mois = Vente::where('client_id', $client->id)
+            ->whereMonth('date_heure', now()->month)
+            ->whereYear('date_heure', now()->year)
+            ->count();
     }
 
-    public function create(): View
-    {
-        return view('super-admin.clients.create');
-    }
+    return view('super-admin.clients.index', compact(
+        'clients', 
+        'recherche', 
+        'statutFiltre', 
+        'clientsActifs', 
+        'mrr', 
+        'expirationProche', 
+        'totalDepots'
+    ));
+}
 
     public function store(Request $request): RedirectResponse
     {

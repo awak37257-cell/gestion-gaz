@@ -3,158 +3,185 @@
 @section('titre', $client->nom)
 
 @section('content')
-    <div class="entete-page">
-        <div class="entete-page-titre">
-            <div class="icone-badge-petit">
-                <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke-width="1.4"><circle cx="8" cy="4.5" r="2.5"/><path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/></svg>
+    <div class="card-header" style="border-bottom:none;padding-bottom:0;margin-bottom:1.5rem;">
+        <div>
+            <h2 style="font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:800;color:var(--text-main);">
+                {{ $client->nom }}
+            </h2>
+            <div style="font-size:0.85rem;color:var(--text-muted);margin-top:0.2rem;">
+                Client enregistré le {{ $client->created_at->format('d/m/Y') }} • ID #{{ $client->id }}
             </div>
-            <h1>{{ $client->nom }}</h1>
         </div>
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+            <form method="POST" action="{{ route('super-admin.clients.impersonner', $client) }}">
+                @csrf
+                <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('Vous connecter en tant qu\'administrateur de ce client ?')">
+                    🚀 Se connecter au compte (Impersonner)
+                </button>
+            </form>
             <form method="POST" action="{{ route('super-admin.clients.renouveler', $client) }}">
                 @csrf
                 @method('PATCH')
-                <button type="submit" class="bouton bouton-secondaire">Renouveler</button>
+                <button type="submit" class="btn btn-secondary btn-sm">Prolonger abonnement</button>
             </form>
             <form method="POST" action="{{ route('super-admin.clients.basculer-statut', $client) }}">
                 @csrf
                 @method('PATCH')
-                <button type="submit" class="bouton bouton-secondaire">{{ $client->statut === 'actif' ? 'Suspendre' : 'Activer' }}</button>
+                <button type="submit" class="btn {{ $client->statut === 'actif' ? 'btn-danger-outline' : 'btn-secondary' }} btn-sm">
+                    {{ $client->statut === 'actif' ? 'Suspendre l\'accès' : 'Activer l\'accès' }}
+                </button>
             </form>
-            <a href="{{ route('super-admin.clients.edit', $client) }}" class="bouton bouton-primaire">Modifier</a>
+            <a href="{{ route('super-admin.clients.edit', $client) }}" class="btn btn-secondary btn-sm">Modifier</a>
         </div>
     </div>
 
     @if (session('mot_de_passe_genere'))
-        <div class="carte carte-accent">
-            <h3 style="margin-top:0;">Identifiants générés</h3>
-            <p style="font-size:13px;color:var(--couleur-texte-clair);">
-                Communique ces identifiants au client — ce mot de passe ne sera plus jamais affiché après avoir quitté cette page.
+        <div class="key-banner">
+            <h3 style="color:#a855f7;font-family:'Outfit',sans-serif;margin-bottom:0.4rem;">🔑 Identifiants d'accès générés pour le client</h3>
+            <p style="font-size:0.88rem;color:#cbd5e1;">
+                Communiquez ces identifiants à l'administrateur du dépôt. Ce mot de passe temporaire ne sera plus affiché après avoir quitté cette page.
             </p>
-            <p style="margin-bottom:4px;"><strong>Email :</strong> {{ $client->users->last()?->email }}</p>
-            <div class="mot-de-passe-bloc">{{ session('mot_de_passe_genere') }}</div>
+            <div style="margin-top:0.8rem;">
+                <div><strong>Email de connexion :</strong> {{ session('email_client') ?? $client->users->first()?->email }}</div>
+                <div><strong>Mot de passe :</strong></div>
+                <div class="key-code">{{ session('mot_de_passe_genere') }}</div>
+            </div>
         </div>
     @endif
 
-    <div class="carte">
-        <h3 style="margin-top:0;">Abonnement</h3>
-        <table>
-            <tr><td style="color:var(--couleur-texte-clair);">Périodicité</td><td style="text-transform:capitalize;">{{ $client->periode_abonnement }}</td></tr>
-            <tr><td style="color:var(--couleur-texte-clair);">Montant</td><td>{{ number_format($client->montant_abonnement, 0, ',', ' ') }} FCFA</td></tr>
-            <tr><td style="color:var(--couleur-texte-clair);">Début</td><td>{{ $client->date_debut_abonnement->format('d/m/Y') }}</td></tr>
-            <tr><td style="color:var(--couleur-texte-clair);">Fin</td><td>{{ $client->date_fin_abonnement->format('d/m/Y') }}</td></tr>
-            <tr>
-                <td style="color:var(--couleur-texte-clair);">Statut</td>
-                <td>
-                    @if ($client->statut === 'actif')
-                        <span class="badge badge-actif">Actif</span>
-                    @elseif ($client->statut === 'suspendu')
-                        <span class="badge badge-suspendu">Suspendu</span>
-                    @else
-                        <span class="badge badge-expire">Expiré</span>
-                    @endif
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="carte">
-        <h3 style="margin-top:0;">Comptes administrateurs</h3>
-        <table>
-            <thead><tr><th>Nom</th><th>Email</th><th></th></tr></thead>
-            <tbody>
-                @forelse ($client->users as $utilisateur)
-                    <tr>
-                        <td>{{ $utilisateur->name }}</td>
-                        <td>{{ $utilisateur->email }}</td>
-                        <td></td>
-                    </tr>
-                @empty
-                    <tr><td colspan="3">Aucun compte pour le moment.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        @if ($client->users->isNotEmpty())
-            <div style="display:flex;gap:8px;margin-top:14px;">
-                <form method="POST" action="{{ route('super-admin.clients.impersonner', $client) }}">
-                    @csrf
-                    <button type="submit" class="bouton bouton-secondaire bouton-petit">Se connecter en tant que ce client</button>
-                </form>
-                <form method="POST" action="{{ route('super-admin.clients.reinitialiser-mot-de-passe', $client) }}" onsubmit="return confirm('Générer un nouveau mot de passe pour ce client ?');">
-                    @csrf
-                    <button type="submit" class="bouton bouton-secondaire bouton-petit">Réinitialiser le mot de passe</button>
-                </form>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+        <!-- Détails de l'abonnement -->
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-header">
+                <h3 class="card-title">💳 Détails de l'abonnement</h3>
             </div>
-        @endif
+            <table>
+                <tr>
+                    <td style="color:var(--text-muted);font-weight:600;">Statut</td>
+                    <td>
+                        @if ($client->statut === 'actif')
+                            <span class="badge badge-actif">Actif</span>
+                        @elseif ($client->statut === 'suspendu')
+                            <span class="badge badge-suspendu">Suspendu</span>
+                        @else
+                            <span class="badge badge-expire">Expiré</span>
+                        @endif
+                    </td>
+                </tr>
+                <tr>
+                    <td style="color:var(--text-muted);font-weight:600;">Périodicité</td>
+                    <td style="text-transform:capitalize;">{{ $client->periode_abonnement }}</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--text-muted);font-weight:600;">Montant</td>
+                    <td style="font-family:'JetBrains Mono',monospace;font-weight:700;">{{ number_format($client->montant_abonnement, 0, ',', ' ') }} FCFA</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--text-muted);font-weight:600;">Date de début</td>
+                    <td>{{ $client->date_debut_abonnement->format('d/m/Y') }}</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--text-muted);font-weight:600;">Date d'expiration</td>
+                    <td style="font-weight:700;color:{{ $client->date_fin_abonnement->isPast() ? 'var(--danger)' : 'var(--text-main)' }};">
+                        {{ $client->date_fin_abonnement->format('d/m/Y') }}
+                        @if ($client->date_fin_abonnement->isFuture())
+                            <span style="font-size:12px;color:var(--text-muted);font-weight:normal;">({{ now()->diffInDays($client->date_fin_abonnement) }} jours restants)</span>
+                        @endif
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Coordonnées & Utilisateurs -->
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-header">
+                <h3 class="card-title">📞 Coordonnées & Utilisateurs</h3>
+            </div>
+            <table>
+                <tr>
+                    <td style="color:var(--text-muted);font-weight:600;">Email contact</td>
+                    <td>{{ $client->email_contact ?? 'Non renseigné' }}</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--text-muted);font-weight:600;">Téléphone</td>
+                    <td>{{ $client->telephone ?? 'Non renseigné' }}</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--text-muted);font-weight:600;">Comptes Admin</td>
+                    <td>
+                        @foreach ($client->users as $u)
+                            <div><strong>{{ $u->name }}</strong> ({{ $u->email }})</div>
+                        @endforeach
+                    </td>
+                </tr>
+                <tr>
+                    <td style="color:var(--text-muted);font-weight:600;">Dépôts gérés</td>
+                    <td>{{ $client->depots->count() }} dépôt(s) configuré(s)</td>
+                </tr>
+            </table>
+        </div>
     </div>
 
-    <div class="carte carte-accent">
-        <h3 style="margin-top:0;">Paiements</h3>
-
-        <table style="margin-bottom:18px;">
-            <thead><tr><th>Date</th><th>Montant</th><th>Méthode</th><th>Notes</th></tr></thead>
-            <tbody>
-                @forelse ($client->paiements->sortByDesc('date_paiement') as $paiement)
-                    <tr>
-                        <td>{{ $paiement->date_paiement->format('d/m/Y') }}</td>
-                        <td>{{ number_format($paiement->montant, 0, ',', ' ') }} FCFA</td>
-                        <td style="text-transform:capitalize;">{{ str_replace('_', ' ', $paiement->methode) }}</td>
-                        <td>{{ $paiement->notes ?? '—' }}</td>
-                    </tr>
-                @empty
-                    <tr><td colspan="4">Aucun paiement enregistré pour le moment.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        <form method="POST" action="{{ route('super-admin.clients.paiements.store', $client) }}" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+    <!-- Enregistrer un paiement -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">💰 Enregistrer un nouveau règlement</h3>
+        </div>
+        <form method="POST" action="{{ route('super-admin.clients.paiements.store', $client) }}" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1rem;align-items:flex-end;">
             @csrf
-
             <div>
-                <label for="montant">Montant (FCFA)</label>
-                <input type="number" name="montant" id="montant" min="0" required style="margin-bottom:0;max-width:160px;">
+                <label class="form-label" for="montant">Montant (FCFA)</label>
+                <input type="number" name="montant" id="montant" class="form-control" value="{{ $client->montant_abonnement }}" required>
             </div>
-
             <div>
-                <label for="methode">Méthode</label>
-                <select name="methode" id="methode" required style="margin-bottom:0;">
-                    <option value="espece">Espèces</option>
-                    <option value="wave">Wave</option>
-                    <option value="orange_money">Orange Money</option>
-                    <option value="mtn_momo">MTN MoMo</option>
-                    <option value="virement">Virement</option>
+                <label class="form-label" for="mode">Mode de règlement</label>
+                <select name="mode" id="mode" class="form-control">
+                    <option value="Mobile Money">Mobile Money (Orange / MTN)</option>
+                    <option value="Virement">Virement bancaire</option>
+                    <option value="Espèces">Espèces</option>
+                    <option value="Chèque">Chèque</option>
                 </select>
             </div>
-
             <div>
-                <label for="date_paiement">Date</label>
-                <input type="date" name="date_paiement" id="date_paiement" value="{{ now()->toDateString() }}" required style="margin-bottom:0;">
+                <label class="form-label" for="reference">Référence / Reçu</label>
+                <input type="text" name="reference" id="reference" class="form-control" placeholder="Ex: TRX-998822">
             </div>
-
-            <div style="flex:1;min-width:160px;">
-                <label for="notes">Notes (optionnel)</label>
-                <input type="text" name="notes" id="notes" style="margin-bottom:0;">
+            <div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Encaisser le paiement</button>
             </div>
-
-            <button type="submit" class="bouton bouton-primaire">Enregistrer le paiement</button>
         </form>
-        @error('montant')<div class="erreur-champ">{{ $message }}</div>@enderror
     </div>
 
-    <div class="carte">
-        <h3 style="margin-top:0;">Dépôts</h3>
-        <table>
-            <thead><tr><th>Nom</th><th>Localisation</th></tr></thead>
-            <tbody>
-                @forelse ($client->depots as $depot)
-                    <tr><td>{{ $depot->nom }}</td><td>{{ $depot->localisation ?? '—' }}</td></tr>
-                @empty
-                    <tr><td colspan="2">Aucun dépôt créé par ce client pour le moment.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+    <!-- Historique des paiements de ce client -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">📜 Historique des paiements de {{ $client->nom }}</h3>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Montant</th>
+                        <th>Mode</th>
+                        <th>Référence</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($client->paiements->sortByDesc('created_at') as $p)
+                        <tr>
+                            <td>{{ $p->created_at->format('d/m/Y H:i') }}</td>
+                            <td style="font-family:'JetBrains Mono',monospace;font-weight:700;">{{ number_format($p->montant, 0, ',', ' ') }} FCFA</td>
+                            <td><span class="badge badge-purple">{{ $p->mode ?? 'Virement' }}</span></td>
+                            <td>{{ $p->reference ?? '—' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" style="text-align:center;color:var(--text-muted);padding:2rem;">Aucun paiement enregistré pour ce client.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <a href="{{ route('super-admin.clients.index') }}" class="bouton bouton-secondaire">← Retour à la liste</a>
 @endsection

@@ -2,218 +2,339 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-    <title>@yield('titre', 'Espace Vendeur')</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>@yield('titre', 'Espace Vendeur') — GazManager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --couleur-primaire: #8B5CF6;
-            --couleur-primaire-fonce: #6D28D9;
-            --couleur-danger: #EF4444;
-            --couleur-fond: #FAF8FC;
-            --couleur-carte: #FFFFFF;
-            --couleur-texte: #241F3D;
-            --couleur-texte-clair: #7A7390;
-            --couleur-bordure: #EBE6F5;
-            --rayon: 14px;
-            --police-titre: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
-            --police-chiffres: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            --degrade-primaire: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
-            --degrade-primaire-hover: linear-gradient(135deg, #7C3AED 0%, #DB2777 100%);
-            --degrade-secondaire: linear-gradient(135deg, #EC4899 0%, #F97316 100%);
-            --degrade-tertiaire: linear-gradient(135deg, #06B6D4 0%, #8B5CF6 100%);
+            --primary:       #f97316;
+            --primary-dark:  #ea580c;
+            --dark-bg:       #0f172a;
+            --dark-card:     #1e293b;
+            --body-bg:       #f1f5f9;
+            --card-bg:       #ffffff;
+            --card-border:   #e2e8f0;
+            --text-main:     #0f172a;
+            --text-muted:    #64748b;
+            --success:       #10b981;
+            --danger:        #ef4444;
+            --radius:        16px;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background:
-                radial-gradient(circle at 10% 0%, rgba(139,92,246,0.08), transparent 40%),
-                radial-gradient(circle at 90% 90%, rgba(236,72,153,0.06), transparent 45%),
-                var(--couleur-fond);
-            color: var(--couleur-texte);
-            font-variant-numeric: tabular-nums;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--body-bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 70px;
         }
 
-        h1, h2, h3 {
-            font-family: var(--police-titre);
-            font-weight: 600;
-            letter-spacing: -0.01em;
-        }
-
-        .entete {
-            background: linear-gradient(135deg, #241F3D 0%, #3B2A5E 55%, #6D2860 100%);
+        /* ─── HEADER VENDEUR ─────────────────────────────────── */
+        .vendeur-header {
+            background: #0f172a;
             color: #fff;
-            padding: 18px 20px;
-            border-bottom: 3px solid;
-            border-image: linear-gradient(90deg, #8B5CF6, #EC4899, #F97316) 1;
+            padding: 1rem 1.25rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-bottom: 2px solid var(--primary);
         }
 
-        .entete-ligne { display: flex; align-items: center; gap: 10px; }
-        .entete h1 { margin: 0; font-size: 17px; font-weight: 600; }
-        .entete p {
-            margin: 5px 0 0;
-            font-size: 11px;
-            opacity: 0.8;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-
-        main {
-            padding: 16px;
-            max-width: 480px;
+        .header-content {
+            max-width: 540px;
             margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .message {
-            padding: 13px 16px;
+        .seller-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .seller-avatar {
+            width: 40px; height: 40px;
             border-radius: 12px;
-            margin-bottom: 16px;
-            font-size: 14px;
-            border: 1px solid transparent;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff; font-weight: 800; font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 10px rgba(249,115,22,0.4);
         }
 
-        .message-succes { background: #D1FAE5; color: #065F46; border-color: #A7F3D0; }
-        .message-erreur { background: #FEE2E2; color: #B91C1C; border-color: #FECACA; }
-
-        .carte {
-            background: var(--couleur-carte);
-            border: 1px solid var(--couleur-bordure);
-            border-radius: var(--rayon);
-            padding: 18px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 10px rgba(139,92,246,0.07);
-            position: relative;
+        .seller-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.2;
         }
 
-        .carte-accent { padding-left: 23px; }
-        .carte-accent::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 4px;
-            border-radius: var(--rayon) 0 0 var(--rayon);
-            background: var(--degrade-primaire);
-        }
-
-        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--couleur-texte); }
-
-        input, select {
-            width: 100%;
-            padding: 14px 16px;
-            font-size: 16px;
-            font-family: inherit;
-            border: 2px solid var(--couleur-bordure);
-            border-radius: 12px;
-            margin-bottom: 18px;
-            background: #FCFAFF;
-            transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #8B5CF6;
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(139,92,246,0.16);
-        }
-
-        select {
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238B5CF6' stroke-width='2'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            padding-right: 42px;
-        }
-
-        input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
-            margin-right: 8px;
-            vertical-align: middle;
-            accent-color: #8B5CF6;
-        }
-
-        .bouton {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            font-size: 13px;
+        .depot-badge {
+            font-size: 0.72rem;
+            color: var(--primary);
             font-weight: 700;
-            text-align: center;
-            border: 2px solid transparent;
-            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-header-logout {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            padding: 0.45rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
             cursor: pointer;
             text-decoration: none;
-            min-height: 48px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        .bouton-primaire { background: var(--degrade-primaire); color: #fff; box-shadow: 0 4px 14px rgba(139,92,246,0.35); }
-        .bouton-primaire:hover { background: var(--degrade-primaire-hover); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(139,92,246,0.42); }
-
-        .bouton-secondaire { background: #fff; color: var(--couleur-texte); border-color: var(--couleur-bordure); margin-top: 10px; }
-        .bouton-secondaire:hover { border-color: #8B5CF6; color: #6D28D9; }
-
-        .bouton-danger { background: transparent; color: var(--couleur-danger); text-decoration: underline; text-transform: none; letter-spacing: normal; border: none; }
-
-        .lien-retour {
-            display: block;
-            text-align: center;
-            margin-top: 14px;
-            color: var(--couleur-texte-clair);
-            font-size: 13px;
+        /* ─── MAIN APP CONTAINER ─────────────────────────────── */
+        main {
+            padding: 1.25rem 1rem;
+            max-width: 540px;
+            width: 100%;
+            margin: 0 auto;
+            flex: 1;
         }
 
-        .erreur-champ { color: var(--couleur-danger); font-size: 13px; margin-top: -14px; margin-bottom: 16px; }
+        /* ─── CARDS & COMPONENTS ─────────────────────────────── */
+        .carte, .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
+        }
 
-        .badge {
-            display: inline-block;
-            padding: 3px 11px;
-            border-radius: 999px;
-            font-size: 11px;
+        .carte-accent {
+            border-left: 4px solid var(--primary);
+        }
+
+        /* ─── ACTION BUTTONS (MOBILE OPTIMIZED) ──────────────── */
+        .btn-action-big {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.2rem 1.4rem;
+            background: #ffffff;
+            border: 2px solid var(--card-border);
+            border-radius: 16px;
+            color: var(--text-main);
+            text-decoration: none;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
 
-        .badge-changement { background: #FCE7F3; color: #9D174D; }
-
-        @media print {
-            .no-print, .entete { display: none !important; }
-            body { background: #fff; }
-            main { max-width: 100%; padding: 0; }
+        .btn-action-big:hover, .btn-action-big:active {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(249,115,22,0.15);
         }
+
+        .btn-action-big.primary-action {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            border: none;
+            box-shadow: 0 6px 20px rgba(249,115,22,0.35);
+        }
+
+        .btn-action-icon {
+            width: 46px; height: 46px;
+            border-radius: 12px;
+            background: #fff7ed;
+            color: var(--primary);
+            font-size: 1.4rem;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .btn-action-big.primary-action .btn-action-icon {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        /* ─── BUTTONS ────────────────────────────────────────── */
+        .bouton, .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 800;
+            border-radius: 12px;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid transparent;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .bouton-primaire, .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(249,115,22,0.35);
+        }
+
+        .bouton-secondaire, .btn-secondary {
+            background: #fff;
+            color: var(--text-main);
+            border-color: var(--card-border);
+        }
+
+        /* ─── FORMS ──────────────────────────────────────────── */
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: var(--text-main);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-main);
+            background: #ffffff;
+            margin-bottom: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(249,115,22,0.15);
+        }
+
+        /* ─── ALERTS ─────────────────────────────────────────── */
+        .message {
+            padding: 0.9rem 1.1rem;
+            border-radius: 12px;
+            margin-bottom: 1.2rem;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .message-succes { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .message-erreur { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+        /* ─── BOTTOM NAV MOBILE ──────────────────────────────── */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #ffffff;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0.5rem 0.6rem;
+            z-index: 50;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.3rem 0.6rem;
+            border-radius: 8px;
+            transition: all 0.15s;
+        }
+
+        .bottom-nav-item.active, .bottom-nav-item:hover {
+            color: var(--primary);
+        }
+
+        .bottom-nav-item svg { width: 20px; height: 20px; }
     </style>
 </head>
 <body>
-    <div class="entete">
-        <div class="entete-ligne">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="9" stroke="#EC4899" stroke-width="1.8"/>
-                <line x1="12" y1="12" x2="16" y2="7" stroke="#EC4899" stroke-width="1.8" stroke-linecap="round"/>
-                <circle cx="12" cy="12" r="1.8" fill="#EC4899"/>
-            </svg>
-            <h1>@yield('titre', 'Espace Vendeur')</h1>
-        </div>
-        @isset($vendeur)
-            <p>{{ $vendeur->nom }} — Dépôt {{ $vendeur->depot->nom }}</p>
-        @endisset
-    </div>
 
+    <!-- ════ HEADER VENDEUR ═══════════════════════════════════ -->
+    <header class="vendeur-header">
+        <div class="header-content">
+            <div class="seller-info">
+                <div class="seller-avatar">🔥</div>
+                <div>
+                    <div class="seller-name">{{ session('vendeur_nom', 'Vendeur') }}</div>
+                    <div class="depot-badge">
+                        <span>🏬</span> {{ session('vendeur_depot_nom', 'Dépôt') }}
+                    </div>
+                </div>
+            </div>
+            <form method="POST" action="{{ route('vendeur.deconnexion') }}" style="margin:0;">
+                @csrf
+                <button type="submit" class="btn-header-logout" onclick="return confirm('Terminer votre session de vente ?')">
+                    ✕ Déconnexion
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <!-- ════ CONTENU PRINCIPAL ════════════════════════════════ -->
     <main>
         @if (session('succes'))
-            <div class="message message-succes">{{ session('succes') }}</div>
+            <div class="message message-succes">
+                <span>✓</span> {{ session('succes') }}
+            </div>
         @endif
 
         @if (session('erreur'))
-            <div class="message message-erreur">{{ session('erreur') }}</div>
+            <div class="message message-erreur">
+                <span>✕</span> {{ session('erreur') }}
+            </div>
         @endif
 
         @yield('content')
     </main>
+
+    <!-- ════ BARRE DE NAVIGATION INFÉRIEURE MOBILE ════════════ -->
+    <nav class="bottom-nav">
+        <a href="{{ route('vendeur.dashboard') }}" class="bottom-nav-item {{ request()->routeIs('vendeur.dashboard') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Accueil
+        </a>
+        <a href="{{ route('vendeur.ventes.create') }}" class="bottom-nav-item {{ request()->routeIs('vendeur.ventes.*') ? 'active' : '' }}" style="color:var(--primary);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Vente
+        </a>
+        <a href="{{ route('vendeur.demandes.create') }}" class="bottom-nav-item {{ request()->routeIs('vendeur.demandes.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            Réassort
+        </a>
+        <a href="{{ route('vendeur.inventaires.create') }}" class="bottom-nav-item {{ request()->routeIs('vendeur.inventaires.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Inventaire
+        </a>
+    </nav>
+
 </body>
 </html>

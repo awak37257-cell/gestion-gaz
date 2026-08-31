@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('demandes_acces', function (Blueprint $table) {
             $table->id();
+            $table->string('nom_entreprise');
+            $table->string('nom_contact');
+            $table->string('email');
+            $table->string('telephone')->nullable();
+            $table->string('periode_souhaitee')->default('mensuel'); // mensuel, trimestriel, annuel
+            $table->text('message')->nullable();
+            $table->string('statut')->default('en_attente'); // en_attente, validee, rejetee
+            $table->foreignId('client_id')->nullable()->constrained('clients')->nullOnDelete();
             $table->timestamps();
         });
     }

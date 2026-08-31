@@ -3,63 +3,61 @@
 @section('titre', 'Tableau de bord')
 
 @section('content')
-    <div class="entete-page" style="display: flex; justify-content: space-between; align-items: center;">
-        <h1>Tableau de bord</h1>
-
+    <div class="entete-page">
+        <h1>📊 Tableau de bord Dépôt</h1>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        <div class="carte carte-accent carte-stat" style="margin-bottom: 0;">
-            <div class="icone-badge">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M3 17l5-5 4 4 8-9"/><path d="M15 7h5v5"/></svg>
-            </div>
-            <div>
-                <div style="font-size: 12px; color: var(--couleur-texte-clair); text-transform: uppercase; letter-spacing: 0.05em;">Ventes aujourd'hui</div>
-                <div style="font-size: 32px; font-weight: 700; color: var(--couleur-primaire); font-family: var(--police-chiffres);">{{ $totalVentesDuJour }}</div>
-            </div>
-        </div>
-        
-        <div class="carte carte-accent carte-stat" style="margin-bottom: 0;">
-            <div class="icone-badge icone-badge-c">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M6 3h9l3 3v14.5H6V3z"/><path d="M9 9h6M9 12.5h6M9 16h4"/></svg>
-            </div>
-            <div>
-                <div style="font-size: 12px; color: var(--couleur-texte-clair); text-transform: uppercase; letter-spacing: 0.05em;">Demandes en attente</div>
-                <div style="font-size: 32px; font-weight: 700; color: #06B6D4; font-family: var(--police-chiffres);">{{ $demandesEnAttente }}</div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon-wrapper">💰</div>
+            <div class="stat-content">
+                <div class="stat-label">Ventes Aujourd'hui</div>
+                <div class="stat-value">{{ $totalVentesDuJour }} <span style="font-size:0.9rem;color:var(--text-muted);font-weight:500;">bouteille(s)</span></div>
             </div>
         </div>
 
-        <div class="carte carte-accent-danger carte-stat" style="margin-bottom: 0;">
-            <div class="icone-badge danger">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.6" fill="#fff" stroke="none"/></svg>
+        <div class="stat-card accent-yellow">
+            <div class="stat-icon-wrapper">🚚</div>
+            <div class="stat-content">
+                <div class="stat-label">Demandes en attente</div>
+                <div class="stat-value">{{ $demandesEnAttente }}</div>
             </div>
-            <div>
-                <div style="font-size: 12px; color: var(--couleur-texte-clair); text-transform: uppercase; letter-spacing: 0.05em;">Couleurs en stock bas</div>
-                <div style="font-size: 32px; font-weight: 700; color: var(--couleur-danger); font-family: var(--police-chiffres);">{{ $stocksBas->count() }}</div>
+        </div>
+
+        <div class="stat-card {{ $stocksBas->count() > 0 ? 'accent-red' : 'accent-green' }}">
+            <div class="stat-icon-wrapper">⚠️</div>
+            <div class="stat-content">
+                <div class="stat-label">Alertes Stock Bas</div>
+                <div class="stat-value" style="{{ $stocksBas->count() > 0 ? 'color:var(--danger);' : '' }}">{{ $stocksBas->count() }}</div>
             </div>
         </div>
     </div>
 
-    <div class="carte">
-        <h3 style="margin-top: 0; margin-bottom: 16px; color: var(--couleur-primaire-fonce); font-size: 18px;">Ventes du jour par dépôt</h3>
-        <div style="overflow-x: auto;">
+    <!-- Ventes du jour par dépôt -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">🏬 Ventes du jour par dépôt</h3>
+        </div>
+        <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
-                        <th>Dépôt</th>
-                        <th style="text-align: right;">Ventes</th>
+                        <th>Nom du Dépôt</th>
+                        <th style="text-align: right;">Bouteilles vendues</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($ventesParDepot as $ligne)
-                        <tr style="transition: background 0.15s;">
-                            <td style="font-weight: 500;">{{ $ligne->depot_nom }}</td>
-                            <td style="text-align: right; font-family: var(--police-chiffres); font-weight: 600;">{{ $ligne->total }}</td>
+                        <tr>
+                            <td style="font-weight: 700;">{{ $ligne->depot_nom }}</td>
+                            <td style="text-align: right; font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--primary);">
+                                {{ $ligne->total }}
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="2" style="text-align: center; color: var(--couleur-texte-clair); padding: 32px;">
-                                Aucune vente aujourd'hui.
+                            <td colspan="2" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                                Aucune vente enregistrée aujourd'hui.
                             </td>
                         </tr>
                     @endforelse
@@ -68,30 +66,36 @@
         </div>
     </div>
 
-    <div class="carte">
-        <h3 style="margin-top: 0; margin-bottom: 16px; color: var(--couleur-primaire-fonce); font-size: 18px;">Alertes stock bas</h3>
-        <div style="overflow-x: auto;">
+    <!-- Alertes stock bas -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">⚠️ Bouteilles en stock critique (Stock bas)</h3>
+            <a href="{{ route('admin.stocks.index') }}" class="btn btn-secondary btn-sm">Voir tout le stock</a>
+        </div>
+        <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
                         <th>Dépôt</th>
-                        <th>Type / Couleur</th>
-                        <th style="text-align: right;">Stock pleines</th>
+                        <th>Marque & Format</th>
+                        <th style="text-align: right;">Bouteilles Pleines</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($stocksBas as $stock)
-                        <tr style="transition: background 0.15s;">
-                            <td style="color: var(--couleur-texte-clair);">{{ $stock->depot->nom }}</td>
-                            <td style="font-weight: 500;">{{ $stock->couleur->nomComplet() }}</td>
+                        <tr>
+                            <td style="color: var(--text-muted);">{{ $stock->depot->nom }}</td>
+                            <td style="font-weight: 700;">{{ $stock->couleur->nomComplet() }}</td>
                             <td style="text-align: right;">
-                                <span class="badge badge-attente" style="font-family: var(--police-chiffres);">{{ $stock->quantite_pleines }}</span>
+                                <span class="badge badge-suspendu" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+                                    {{ $stock->quantite_pleines }} restante(s)
+                                </span>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" style="text-align: center; color: var(--couleur-texte-clair); padding: 32px;">
-                                Aucune alerte pour le moment.
+                            <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                                ✅ Tous les stocks sont au-dessus des seuils d'alerte.
                             </td>
                         </tr>
                     @endforelse
