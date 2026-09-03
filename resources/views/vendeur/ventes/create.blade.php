@@ -11,7 +11,7 @@
     </div>
 
     <div class="carte carte-accent">
-    <form method="POST" action="{{ route('vendeur.ventes.store') }}">
+    <form method="POST" action="{{ route('vendeur.ventes.store', ['tokenQr' => request()->route('tokenQr')]) }}">
         @csrf
 
         <label for="couleur_vendue_id">Couleur vendue</label>

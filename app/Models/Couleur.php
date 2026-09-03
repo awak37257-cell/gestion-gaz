@@ -15,6 +15,7 @@ class Couleur extends Model
     protected $fillable = [
         'client_id',
         'marque_id',
+        'type',
         'nom_couleur',
         'poids',
         'prix_unitaire',

@@ -62,4 +62,8 @@ class Vente extends Model
     {
         return $this->prix_unitaire * $this->quantite;
     }
+    public function couleur()
+{
+    return $this->belongsTo(Couleur::class);
+}
 }

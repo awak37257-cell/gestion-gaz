@@ -35,6 +35,7 @@ class CouleurController extends Controller
             'nom_couleur' => ['required', 'string', 'max:255'],
             'poids' => ['required', 'string', 'max:50'],
             'prix_unitaire' => ['required', 'integer', 'min:0'],
+            'type' => ['required', 'string', 'max:50'],
         ]);
 
         DB::transaction(function () use ($donnees) {

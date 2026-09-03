@@ -34,6 +34,9 @@ Route::middleware('client.actif')->prefix('admin')->name('admin.')->group(functi
     Route::resource('marques', MarqueController::class)->except('show');
     Route::resource('couleurs', CouleurController::class)->except('show');
     Route::resource('vendeurs', AdminVendeurController::class);
+    
+    // Route unique et correcte pour consulter les ventes d'un dépôt
+    Route::get('/ventes/depot/{depotId}', [AdminDashboardController::class, 'ventesParDepotJour'])->name('ventes.depot.jour');
 
     Route::get('/stocks', [StockController::class, 'index'])->name('stocks.index');
     Route::patch('/stocks/{stock}', [StockController::class, 'update'])->name('stocks.update');
@@ -41,10 +44,13 @@ Route::middleware('client.actif')->prefix('admin')->name('admin.')->group(functi
     Route::get('/demandes', [AdminDemandeController::class, 'index'])->name('demandes.index');
     Route::patch('/demandes/{demande}/valider', [AdminDemandeController::class, 'valider'])->name('demandes.valider');
     Route::patch('/demandes/{demande}/livrer', [AdminDemandeController::class, 'livrer'])->name('demandes.livrer');
+    
     Route::get('/inventaires', [AdminInventaireController::class, 'index'])->name('inventaires.index');
-Route::get('/parametres', [ParametreController::class, 'index'])->name('parametres.index');
+    
+    Route::get('/parametres', [ParametreController::class, 'index'])->name('parametres.index');
     Route::put('/parametres', [ParametreController::class, 'update'])->name('parametres.update');
 });
+
 Route::middleware(['auth', 'super-admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
     Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/paiements', [SuperAdminPaiementController::class, 'index'])->name('paiements.index');

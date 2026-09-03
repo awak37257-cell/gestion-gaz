@@ -11,13 +11,16 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-->withMiddleware(function (Middleware $middleware) {
-  $middleware->alias([
-    'vendeur.connecte' => \App\Http\Middleware\EnsureVendeurConnecte::class,
-    'super-admin' => \App\Http\Middleware\EnsureIsSuperAdmin::class,
-    'client.actif' => \App\Http\Middleware\EnsureIsClientAdmin::class,
-]);
-})
+    ->withMiddleware(function (Middleware $middleware) {
+        // Faire confiance au tunnel externe (Localtunnel)
+        $middleware->trustProxies(at: '*');
+
+        $middleware->alias([
+            'vendeur.connecte' => \App\Http\Middleware\EnsureVendeurConnecte::class,
+            'super-admin' => \App\Http\Middleware\EnsureIsSuperAdmin::class,
+            'client.actif' => \App\Http\Middleware\EnsureIsClientAdmin::class,
+        ]);
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),

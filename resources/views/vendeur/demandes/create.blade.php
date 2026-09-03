@@ -46,30 +46,36 @@
     <a href="{{ route('vendeur.dashboard') }}" class="lien-retour">← Retour au tableau de bord</a>
 
     <script>
-        const couleursParMarque = @json($marques->mapWithKeys(fn ($marque) => [
-            $marque->id => $marque->couleurs->map(fn ($couleur) => [
-                'id' => $couleur->id,
-                'label' => "{$couleur->nom_couleur} ({$couleur->poids})",
-            ]),
-        ]));
+    const couleursParMarque = @json($marques->mapWithKeys(function ($marque) {
+        return [
+            $marque->id => $marque->couleurs->map(function ($couleur) {
+                return [
+                    'id' => $couleur->id,
+                    'label' => $couleur->nom_couleur . ' (' . $couleur->poids . ')',
+                ];
+            })
+        ];
+    }));
 
-        const selectMarque = document.getElementById('marque_id');
-        const selectCouleur = document.getElementById('couleur_id');
+    const selectMarque = document.getElementById('marque_id');
+    const selectCouleur = document.getElementById('couleur_id');
 
-        function actualiserCouleurs() {
-            const couleurs = couleursParMarque[selectMarque.value] ?? [];
-            selectCouleur.innerHTML = '<option value="">— Choisir —</option>';
-            couleurs.forEach(function (couleur) {
-                const option = document.createElement('option');
-                option.value = couleur.id;
-                option.textContent = couleur.label;
-                selectCouleur.appendChild(option);
-            });
-        }
+    function actualiserCouleurs() {
+        const couleurs = couleursParMarque[selectMarque.value] ?? [];
+        selectCouleur.innerHTML = '<option value="">— Choisir —</option>';
+        couleurs.forEach(function (couleur) {
+            const option = document.createElement('option');
+            option.value = couleur.id;
+            option.textContent = couleur.label;
+            selectCouleur.appendChild(option);
+        });
+    }
 
+    if (selectMarque) {
         selectMarque.addEventListener('change', actualiserCouleurs);
         if (selectMarque.value) {
             actualiserCouleurs();
         }
-    </script>
+    }
+</script>
 @endsection
