@@ -66,4 +66,5 @@ class Vente extends Model
 {
     return $this->belongsTo(Couleur::class);
 }
+
 }

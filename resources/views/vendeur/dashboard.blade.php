@@ -3,16 +3,32 @@
 @section('titre', 'Tableau de bord Vendeur')
 
 @section('content')
-    <!-- KPI Ventes du jour -->
-    <div class="carte" style="text-align:center;background:linear-gradient(135deg, #1e293b, #0f172a);color:#fff;border:1px solid #334155;">
-        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:0.25rem;">
-            Ventes Réalisées Aujourd'hui
+    <!-- KPI Séparés : Ventes du jour et Ventes du mois -->
+    <div style="display:flex;gap:0.75rem;margin-bottom:1.25rem;">
+        <!-- Ventes du jour -->
+        <div class="carte" style="flex:1;text-align:center;background:linear-gradient(135deg, #1e293b, #0f172a);color:#fff;border:1px solid #334155;margin-bottom:0;padding:1rem;">
+            <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:0.2rem;">
+                Aujourd'hui
+            </div>
+            <div style="font-size:2.5rem;font-weight:900;color:var(--primary);font-family:'Outfit',sans-serif;line-height:1;">
+                {{ $nombreVentesJour ?? 0 }}
+            </div>
+            <div style="font-size:0.75rem;color:#94a3b8;margin-top:0.2rem;">
+                Bouteille(s)
+            </div>
         </div>
-        <div style="font-size:3.2rem;font-weight:900;color:var(--primary);font-family:'Outfit',sans-serif;line-height:1;">
-            {{ $nombreVentes }}
-        </div>
-        <div style="font-size:0.8rem;color:#94a3b8;margin-top:0.3rem;">
-            Bouteille(s) de gaz vendue(s)
+
+        <!-- Ventes du mois -->
+        <div class="carte" style="flex:1;text-align:center;background:linear-gradient(135deg, #1e293b, #0f172a);color:#fff;border:1px solid #334155;margin-bottom:0;padding:1rem;">
+            <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:0.2rem;">
+                Ce mois-ci
+            </div>
+            <div style="font-size:2.5rem;font-weight:900;color:var(--primary);font-family:'Outfit',sans-serif;line-height:1;">
+                {{ $nombreVentesMois ?? 0 }}
+            </div>
+            <div style="font-size:0.75rem;color:#94a3b8;margin-top:0.2rem;">
+                Bouteille(s)
+            </div>
         </div>
     </div>
 
@@ -44,11 +60,18 @@
         </a>
     </div>
 
-    <!-- Ventes du jour -->
+    <!-- Ventes du jour avec bouton Consulter -->
     <div class="carte">
-        <h3 style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;margin-bottom:0.75rem;color:var(--text-main);">
-            📜 Dernières ventes du jour
-        </h3>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+            <h3 style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;margin:0;color:var(--text-main);">
+                📜 Dernières ventes du jour
+            </h3>
+            <!-- Assure-toi que la route 'vendeur.ventes.index' existe pour l'historique complet -->
+            <a href="{{ route('vendeur.ventes.index') }}" style="font-size:0.8rem;font-weight:700;color:var(--primary);text-decoration:none;">
+                Consulter tout ➔
+            </a>
+        </div>
+
         @forelse ($ventesDuJour as $vente)
             <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #f1f5f9;">
                 <div>

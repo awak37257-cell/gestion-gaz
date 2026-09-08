@@ -6,6 +6,7 @@ use App\Models\Inventaire;
 use App\Models\InventaireLigne;
 use App\Models\Stock;
 use App\Models\Vendeur;
+use App\Models\Marque;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,16 +14,21 @@ use Illuminate\Support\Facades\DB;
 
 class InventaireController extends Controller
 {
-    public function create(): View
-    {
-        $vendeur = Vendeur::findOrFail(session('vendeur_id'));
+  public function create(): View
+{
+    // On récupère le vendeur connecté via la session
+    $vendeur = Vendeur::findOrFail(session('vendeur_id'));
+    
+    // On filtre les stocks en utilisant le depot_id du vendeur
+    $stocks = Stock::with(['couleur.marque'])
+        ->where('depot_id', $vendeur->depot_id)
+        ->get();
 
-        $stocks = Stock::with('couleur.marque')
-            ->where('depot_id', $vendeur->depot_id)
-            ->get();
+    // Récupérer toutes les marques et leurs couleurs pour les filtres du haut
+    $marques = Marque::with('couleurs')->get();
 
-        return view('vendeur.inventaires.create', compact('stocks'));
-    }
+    return view('vendeur.inventaires.create', compact('stocks', 'marques'));
+}
 
     public function store(Request $request): RedirectResponse
     {

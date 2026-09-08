@@ -14,6 +14,17 @@ use Illuminate\Validation\ValidationException;
 
 class VenteController extends Controller
 {
+    public function index(): View
+{
+    $vendeurId = session('vendeur_id');
+
+    $ventes = Vente::where('vendeur_id', $vendeurId)
+        ->with(['couleurVendue.marque', 'couleurDemandee'])
+        ->latest('date_heure')
+        ->paginate(15); // Pagination pour afficher proprement l'historique
+
+    return view('vendeur.ventes.index', compact('ventes'));
+}
     public function create(): View
     {
         $vendeur = Vendeur::findOrFail(session('vendeur_id'));

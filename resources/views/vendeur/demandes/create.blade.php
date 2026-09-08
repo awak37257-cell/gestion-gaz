@@ -25,9 +25,14 @@
             <div class="erreur-champ">{{ $message }}</div>
         @enderror
 
-        <label for="couleur_id">Couleur</label>
-        <select name="couleur_id" id="couleur_id" required>
+        <label for="nom_couleur">Couleur</label>
+        <select id="nom_couleur" required>
             <option value="">— Choisir une marque d'abord —</option>
+        </select>
+
+        <label for="couleur_id">Type</label>
+        <select name="couleur_id" id="couleur_id" required>
+            <option value="">— Choisir une couleur d'abord —</option>
         </select>
         @error('couleur_id')
             <div class="erreur-champ">{{ $message }}</div>
@@ -45,37 +50,52 @@
 
     <a href="{{ route('vendeur.dashboard') }}" class="lien-retour">← Retour au tableau de bord</a>
 
-    <script>
-    const couleursParMarque = @json($marques->mapWithKeys(function ($marque) {
-        return [
-            $marque->id => $marque->couleurs->map(function ($couleur) {
-                return [
-                    'id' => $couleur->id,
-                    'label' => $couleur->nom_couleur . ' (' . $couleur->poids . ')',
-                ];
-            })
-        ];
-    }));
+   <script>
+    // Les données viennent directement du contrôleur de façon sécurisée
+    const donneesParMarque = @json($donneesParMarque);
 
     const selectMarque = document.getElementById('marque_id');
-    const selectCouleur = document.getElementById('couleur_id');
+    const selectNomCouleur = document.getElementById('nom_couleur');
+    const selectCouleurId = document.getElementById('couleur_id');
 
-    function actualiserCouleurs() {
-        const couleurs = couleursParMarque[selectMarque.value] ?? [];
-        selectCouleur.innerHTML = '<option value="">— Choisir —</option>';
-        couleurs.forEach(function (couleur) {
+    function actualiserNomsCouleurs() {
+        const marqueId = selectMarque.value;
+        const couleurs = donneesParMarque[marqueId] || [];
+        
+        const nomsUniques = [...new Set(couleurs.map(c => c.nom_couleur))];
+
+        selectNomCouleur.innerHTML = '<option value="">— Choisir une couleur —</option>';
+        selectCouleurId.innerHTML = '<option value="">— Choisir une couleur d\'abord —</option>';
+
+        nomsUniques.forEach(function (nom) {
             const option = document.createElement('option');
-            option.value = couleur.id;
-            option.textContent = couleur.label;
-            selectCouleur.appendChild(option);
+            option.value = nom;
+            option.textContent = nom;
+            selectNomCouleur.appendChild(option);
+        });
+    }
+
+    function actualiserTypes() {
+        const marqueId = selectMarque.value;
+        const nomCouleur = selectNomCouleur.value;
+        const couleurs = donneesParMarque[marqueId] || [];
+
+        const typesDisponibles = couleurs.filter(c => c.nom_couleur === nomCouleur);
+
+        selectCouleurId.innerHTML = '<option value="">— Choisir un type —</option>';
+        typesDisponibles.forEach(function (item) {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = item.type;
+            selectCouleurId.appendChild(option);
         });
     }
 
     if (selectMarque) {
-        selectMarque.addEventListener('change', actualiserCouleurs);
-        if (selectMarque.value) {
-            actualiserCouleurs();
-        }
+        selectMarque.addEventListener('change', actualiserNomsCouleurs);
+    }
+    if (selectNomCouleur) {
+        selectNomCouleur.addEventListener('change', actualiserTypes);
     }
 </script>
 @endsection

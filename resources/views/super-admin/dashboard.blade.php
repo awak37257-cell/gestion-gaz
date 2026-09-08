@@ -68,11 +68,11 @@
                                 <td>{{ $demande->nom_contact }}</td>
                                 <td><span class="badge badge-purple">{{ ucfirst($demande->periode_souhaitee) }}</span></td>
                                 <td>{{ $demande->email }} • {{ $demande->telephone }}</td>
-                                <td>
-                                    <form method="POST" action="{{ route('super-admin.demandes.valider', $demande) }}" style="display:inline;" onsubmit="return confirm('Créer le compte client pour {{ addslashes($demande->nom_entreprise) }} ?')">
-                                        @csrf
-                                        <button type="submit" class="btn btn-primary btn-sm">✨ Créer l'accès</button>
-                                    </form>
+                               <td>
+                                    {{-- Remplacement du formulaire POST par un lien GET vers le formulaire de création --}}
+                                    <a href="{{ url('/super-admin/demandes/' . $demande->id . '/creer') }}" class="btn btn-primary btn-sm">
+                                        ✨ Créer l'accès
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach

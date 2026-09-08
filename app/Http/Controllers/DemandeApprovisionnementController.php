@@ -12,11 +12,24 @@ use Illuminate\Http\Request;
 class DemandeApprovisionnementController extends Controller
 {
     public function create(): View
-    {
-        $marques = Marque::with('couleurs')->get();
+{
+    $marques = Marque::with('couleurs')->get();
 
-        return view('vendeur.demandes.create', compact('marques'));
-    }
+    // On prépare les données proprement pour le JavaScript
+    $donneesParMarque = $marques->mapWithKeys(function ($marque) {
+        return [
+            $marque->id => $marque->couleurs->map(function ($couleur) {
+                return [
+                    'id' => $couleur->id,
+                    'nom_couleur' => $couleur->nom_couleur,
+                    'type' => $couleur->type,
+                ];
+            })
+        ];
+    });
+
+    return view('vendeur.demandes.create', compact('marques', 'donneesParMarque'));
+}
 
     public function store(Request $request): RedirectResponse
     {
@@ -24,7 +37,7 @@ class DemandeApprovisionnementController extends Controller
 
         $donnees = $request->validate([
             'marque_id' => ['required', 'exists:marques,id'],
-            'couleur_id' => ['required', 'exists:couleurs,id'],
+            'couleur_id' => ['required', 'exists:couleurs,id'], // Récupère l'ID correspondant au type choisi
             'quantite_demandee' => ['required', 'integer', 'min:1'],
         ]);
 

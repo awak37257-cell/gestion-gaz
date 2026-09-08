@@ -24,7 +24,7 @@
                         <tr>
                             <td style="color: var(--text-muted);">{{ \Carbon\Carbon::parse($vente->date_heure)->format('H:i') }}</td>
                             <td style="font-weight: 600;">{{ $vente->vendeur->nom ?? 'N/A' }} {{ $vente->vendeur->prenoms ?? '' }}</td>
-                            <td>{{ $vente->couleur->marque->nom ?? 'N/A' }} - {{ $vente->couleur->nom_couleur }} ({{ $vente->couleur->type }})</td>
+                           <td>{{ $vente->couleurVendue->marque->nom ?? 'N/A' }} - {{ $vente->couleurVendue->nom_couleur ?? '' }} ({{ $vente->couleurVendue->type ?? '' }})</td>
                             <td style="text-align: right; font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--primary);">
                                 {{ $vente->quantite }} unité(s)
                             </td>

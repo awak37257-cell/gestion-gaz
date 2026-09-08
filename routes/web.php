@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemandeApprovisionnementController;
 use App\Http\Controllers\VendeurAccessController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\Admin\CouleurController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DemandeApprovisionnementController as AdminDemandeController;
 use App\Http\Controllers\Admin\DepotController;
+use App\Http\Controllers\ClientEspaceController;
 use App\Http\Controllers\Admin\MarqueController;
 use App\Http\Controllers\Admin\StockController;
 use App\Http\Controllers\Admin\VendeurController as AdminVendeurController;
@@ -29,7 +31,8 @@ Route::post('/demande-acces', [DemandeAccesController::class, 'store'])->name('d
 
 Route::middleware('client.actif')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-
+// Route pour l'espace personnalisé du client via son slug unique
+Route::get('/espace/{client:slug}', [ClientEspaceController::class, 'show'])->name('client.espace');
     Route::resource('depots', DepotController::class)->except('show');
     Route::resource('marques', MarqueController::class)->except('show');
     Route::resource('couleurs', CouleurController::class)->except('show');
@@ -54,13 +57,17 @@ Route::middleware('client.actif')->prefix('admin')->name('admin.')->group(functi
 Route::middleware(['auth', 'super-admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
     Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/paiements', [SuperAdminPaiementController::class, 'index'])->name('paiements.index');
+   // Afficher le formulaire pour configurer le lien et envoyer
+Route::get('/demandes/{demande}/lien', [SuperAdminDemandeAccesController::class, 'formulaireLien'])->name('demandes.formulaire-lien');
 
+// Traiter le formulaire et envoyer l'e-mail
+Route::post('/demandes/{demande}/envoyer-acces', [SuperAdminDemandeAccesController::class, 'envoyerAcces'])->name('demandes.envoyer-acces');
     // Gestion des demandes d'accès publiques
     Route::get('/demandes-acces', [SuperAdminDemandeAccesController::class, 'index'])->name('demandes.index');
     Route::post('/demandes-acces/{demande}/valider', [SuperAdminDemandeAccesController::class, 'valider'])->name('demandes.valider');
     Route::post('/demandes-acces/{demande}/rejeter', [SuperAdminDemandeAccesController::class, 'rejeter'])->name('demandes.rejeter');
     Route::delete('/demandes-acces/{demande}', [SuperAdminDemandeAccesController::class, 'destroy'])->name('demandes.destroy');
-
+    Route::get('/demandes/{demande}/creer', [SuperAdminDemandeAccesController::class, 'create'])->name('super-admin.demandes.create');
     // Gestion des clients
     Route::get('/clients/export', [SuperAdminClientController::class, 'exporter'])->name('clients.exporter');
     Route::resource('clients', SuperAdminClientController::class);
@@ -80,7 +87,7 @@ Route::get('/vendeur/scan/{tokenQr}', [VendeurAccessController::class, 'scan'])-
 Route::middleware('vendeur.connecte')->prefix('vendeur')->name('vendeur.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/deconnexion', [VendeurAccessController::class, 'deconnexion'])->name('deconnexion');
-
+    Route::get('/ventes', [VenteController::class, 'index'])->name('ventes.index');
     Route::get('/ventes/creer', [VenteController::class, 'create'])->name('ventes.create');
     Route::post('/ventes', [VenteController::class, 'store'])->name('ventes.store');
 
@@ -105,3 +112,5 @@ Route::post('/login', [LoginController::class, 'store']);
 
 // Déconnexion (POST ou GET selon ton implémentation, POST est recommandé)
 Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+
+Route::get('/espace/{client:slug}', [ClientEspaceController::class, 'show'])->name('client.espace');

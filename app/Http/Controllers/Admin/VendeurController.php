@@ -46,7 +46,7 @@ class VendeurController extends Controller
     // Affiche la fiche du vendeur avec son QR code à imprimer/donner.
     public function show(Vendeur $vendeur): View
     {
-      $urlScan = 'https://angry-doodles-wave.loca.lt' . route('vendeur.scan', ['tokenQr' => $vendeur->token_qr], false);
+      $urlScan = 'https://thousands-corps-bag-eminem.trycloudflare.com' . route('vendeur.scan', ['tokenQr' => $vendeur->token_qr], false);
 
         return view('admin.vendeurs.show', compact('vendeur', 'urlScan'));
     }

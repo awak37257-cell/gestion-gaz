@@ -3,111 +3,77 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Client;
-use App\Models\DemandeAcces;
-use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use App\Models\DemandeAcces;
+use App\Mail\AccesClientMail;
+use Illuminate\Support\Facades\Mail;
 
 class DemandeAccesController extends Controller
 {
-    public function index(Request $request): View
+    /**
+     * Affiche la liste des demandes d'accès avec les statistiques et les filtres.
+     */
+    public function index(Request $request)
     {
-        $statutFiltre = $request->string('statut')->toString();
+        $statutFiltre = $request->get('statut');
 
-        $demandes = DemandeAcces::with('client')
-            ->when($statutFiltre, fn ($q) => $q->where('statut', $statutFiltre))
-            ->latest()
-            ->get();
-
+        // Statistiques globales
         $totalEnAttente = DemandeAcces::where('statut', 'en_attente')->count();
         $totalValidees = DemandeAcces::where('statut', 'validee')->count();
         $totalRejetees = DemandeAcces::where('statut', 'rejetee')->count();
 
+        // Requête avec filtre optionnel
+        $query = DemandeAcces::with('client')->latest();
+
+        if ($statutFiltre) {
+            $query->where('statut', $statutFiltre);
+        }
+
+        $demandes = $query->get();
+
         return view('super-admin.demandes.index', compact(
             'demandes',
-            'statutFiltre',
             'totalEnAttente',
             'totalValidees',
-            'totalRejetees'
+            'totalRejetees',
+            'statutFiltre'
         ));
     }
 
-    public function valider(DemandeAcces $demande): RedirectResponse
+    /**
+     * Affiche la vue du formulaire pour personnaliser le lien de la demande validée.
+     */
+    public function formulaireLien(DemandeAcces $demande)
     {
-        if ($demande->statut === 'validee' && $demande->client_id) {
-            return redirect()->route('super-admin.clients.show', $demande->client_id)
-                ->with('info', 'Cette demande a déjà été validée.');
+        if (!$demande->client) {
+            return redirect()->back()->with('error', 'Veuillez d\'abord valider cette demande pour créer le compte client.');
         }
 
-        // Vérifier si l'email existe déjà dans users
-        if (User::where('email', $demande->email)->exists()) {
-            return back()->with('erreur', "Un compte utilisateur existe déjà avec l'adresse email {$demande->email}.");
-        }
+        $client = $demande->client;
 
-        $montant = match ($demande->periode_souhaitee) {
-            'trimestriel' => 40000,
-            'annuel' => 150000,
-            default => 15000,
-        };
-
-        $dateDebut = Carbon::now();
-        $dateFin = match ($demande->periode_souhaitee) {
-            'trimestriel' => $dateDebut->copy()->addMonths(3),
-            'annuel' => $dateDebut->copy()->addYear(),
-            default => $dateDebut->copy()->addMonth(),
-        };
-
-        $motDePasseGenere = Str::random(10);
-
-        $client = DB::transaction(function () use ($demande, $montant, $dateDebut, $dateFin, $motDePasseGenere) {
-            $client = Client::create([
-                'nom' => $demande->nom_entreprise,
-                'email_contact' => $demande->email,
-                'telephone' => $demande->telephone,
-                'periode_abonnement' => $demande->periode_souhaitee,
-                'montant_abonnement' => $montant,
-                'date_debut_abonnement' => $dateDebut,
-                'date_fin_abonnement' => $dateFin,
-                'statut' => 'actif',
-            ]);
-
-            User::create([
-                'client_id' => $client->id,
-                'name' => $demande->nom_contact,
-                'email' => $demande->email,
-                'password' => $motDePasseGenere,
-            ]);
-
-            $demande->update([
-                'statut' => 'validee',
-                'client_id' => $client->id,
-            ]);
-
-            return $client;
-        });
-
-        return redirect()->route('super-admin.clients.show', $client)
-            ->with('mot_de_passe_genere', $motDePasseGenere)
-            ->with('email_client', $demande->email)
-            ->with('succes', "Compte client créé avec succès pour {$demande->nom_entreprise} ! Communiquez les identifiants ci-dessous au client.");
+        return view('super-admin.demandes.formulaire-lien', compact('demande', 'client'));
     }
 
-    public function rejeter(DemandeAcces $demande): RedirectResponse
+    /**
+     * Enregistre le slug personnalisé et envoie l'e-mail d'accès au client.
+     */
+    public function envoyerAcces(Request $request, DemandeAcces $demande)
     {
-        $demande->update(['statut' => 'rejetee']);
+        $client = $demande->client;
 
-        return back()->with('succes', "La demande de {$demande->nom_entreprise} a été marquée comme rejetée.");
-    }
+        // Valide le champ personnalisé saisi par le super-admin
+        $request->validate([
+            'slug' => 'required|string|unique:clients,slug,' . $client->id,
+        ]);
 
-    public function destroy(DemandeAcces $demande): RedirectResponse
-    {
-        $demande->delete();
+        // Met à jour le slug du client avec ce que le super-admin a choisi
+        $client->update([
+            'slug' => $request->slug,
+        ]);
 
-        return back()->with('succes', 'Demande supprimée.');
+        // Envoie l'e-mail avec le lien contenant le nouveau slug personnalisé
+        Mail::to($client->email_contact)->send(new AccesClientMail($client, $client->email_contact, 'Mot de passe sécurisé'));
+
+        return redirect()->route('super-admin.demandes.index')->with('success', 'Lien configuré et e-mail d\'accès envoyé avec succès au client !');
     }
 }

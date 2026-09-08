@@ -91,11 +91,33 @@
                                     @endif
                                 </div>
                             </td>
-                            <td>
-                                <span class="badge badge-purple">
-                                    {{ ucfirst($demande->periode_souhaitee) }}
-                                </span>
-                            </td>
+                      <td>
+    <span class="badge badge-purple">
+        {{ ucfirst($demande->periode_souhaitee) }}
+    </span>
+    
+    <!-- Affichage du nombre de jours restants (arrondi en entier) -->
+    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+        @if($demande->client && $demande->client->date_fin_abonnement)
+            @php
+                $finAbonnement = \Carbon\Carbon::parse($demande->client->date_fin_abonnement);
+                $maintenant = \Carbon\Carbon::today(); // Utilise la date du jour sans les heures/minutes
+                $joursRestants = (int) $maintenant->diffInDays($finAbonnement->copy()->startOfDay(), false);
+            @endphp
+
+            @if($joursRestants < 0)
+                <span style="color: #e53e3e; font-weight: bold;">⚠️ Expiré (il y a {{ abs($joursRestants) }} jours)</span>
+            @elseif($joursRestants == 0)
+                <span style="color: #d97706; font-weight: bold;">⚠️ Expire aujourd'hui</span>
+            @else
+                ⏳ Reste <strong>{{ $joursRestants }} jour(s)</strong>
+                <br><small>({{ $finAbonnement->format('d/m/Y') }})</small>
+            @endif
+        @else
+            <span style="color: #cbd5e1;">Non défini</span>
+        @endif
+    </div>
+</td>
                             <td style="font-size:0.82rem;color:var(--text-muted);max-width:240px;">
                                 {{ $demande->message ? Str::limit($demande->message, 80) : '—' }}
                             </td>
@@ -108,34 +130,40 @@
                                     <span class="badge badge-suspendu">Rejetée</span>
                                 @endif
                             </td>
-                            <td style="white-space:nowrap;">
-                                @if ($demande->statut === 'en_attente')
-                                    <form method="POST" action="{{ route('super-admin.demandes.valider', $demande) }}" style="display:inline;" onsubmit="return confirm('Confirmer la création automatique des accès client pour {{ addslashes($demande->nom_entreprise) }} ?')">
-                                        @csrf
-                                        <button type="submit" class="btn btn-primary btn-sm">
-                                            ✨ Créer l'accès
-                                        </button>
-                                    </form>
-                                    <form method="POST" action="{{ route('super-admin.demandes.rejeter', $demande) }}" style="display:inline;">
-                                        @csrf
-                                        <button type="submit" class="btn btn-danger-outline btn-sm" onclick="return confirm('Rejeter cette demande ?')">
-                                            Rejeter
-                                        </button>
-                                    </form>
-                                @elseif ($demande->statut === 'validee' && $demande->client)
-                                    <a href="{{ route('super-admin.clients.show', $demande->client) }}" class="btn btn-secondary btn-sm">
-                                        Voir client ➔
-                                    </a>
-                                @else
-                                    <form method="POST" action="{{ route('super-admin.demandes.destroy', $demande) }}" style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('Supprimer définitivement cette demande ?')">
-                                            Supprimer
-                                        </button>
-                                    </form>
-                                @endif
-                            </td>
+                        <td style="white-space:nowrap;">
+    @if ($demande->statut === 'en_attente')
+        {{-- Lien vers le formulaire de création/validation --}}
+        <a href="{{ url('/super-admin/demandes/' . $demande->id . '/creer') }}" class="btn btn-primary btn-sm">
+            ✨ Créer l'accès
+        </a>
+
+        <form method="POST" action="{{ route('super-admin.demandes.rejeter', $demande) }}" style="display:inline;">
+            @csrf
+            <button type="submit" class="btn btn-danger-outline btn-sm" onclick="return confirm('Rejeter cette demande ?')">
+                Rejeter
+            </button>
+        </form>
+
+    @elseif ($demande->statut === 'validee' && $demande->client)
+        {{-- Bouton symbole de lien qui redirige vers le formulaire de configuration --}}
+        <a href="{{ route('super-admin.demandes.formulaire-lien', $demande) }}" class="btn btn-sm btn-info" title="Configurer le lien et envoyer les accès">
+            🔗 Configurer & Envoyer
+        </a>
+
+        <a href="{{ route('super-admin.clients.show', $demande->client) }}" class="btn btn-secondary btn-sm" style="margin-left: 4px;">
+            Voir client ➔
+        </a>
+
+    @else
+        <form method="POST" action="{{ route('super-admin.demandes.destroy', $demande) }}" style="display:inline;">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('Supprimer définitivement cette demande ?')">
+                Supprimer
+            </button>
+        </form>
+    @endif
+</td>
                         </tr>
                     @empty
                         <tr>

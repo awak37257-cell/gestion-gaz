@@ -7,14 +7,33 @@
         <h1>📊 Tableau de bord Dépôt</h1>
     </div>
 
+    {{-- Calcul rapide pour identifier le dépôt leader des ventes --}}
+    @php
+        $depotLeader = $ventesParDepot->sortByDesc('total')->first();
+    @endphp
+
     <div class="stats-grid">
         <div class="stat-card">
-        <div class="stat-icon-wrapper">💰</div>
-        <div class="stat-content">
-            <div class="stat-label">Total Ventes Globales</div>
-            <div class="stat-value">{{ $totalVentesGlobal }} <span style="font-size:0.9rem;color:var(--text-muted);font-weight:500;">bouteille(s)</span></div>
+            <div class="stat-icon-wrapper">💰</div>
+            <div class="stat-content">
+                <div class="stat-label">Total Ventes Globales</div>
+                <div class="stat-value">{{ $totalVentesGlobal }} <span style="font-size:0.9rem;color:var(--text-muted);font-weight:500;">bouteille(s)</span></div>
+            </div>
         </div>
-    </div>
+
+        {{-- NOUVELLE CARTE STATISTIQUE : Dépôt le plus performant --}}
+        <div class="stat-card accent-green">
+            <div class="stat-icon-wrapper">🏆</div>
+            <div class="stat-content">
+                <div class="stat-label">Dépôt Top Ventes</div>
+                <div class="stat-value" style="font-size: 1.2rem; font-weight: 700;">
+                    {{ $depotLeader ? $depotLeader->depot_nom : 'Aucun' }}
+                    @if($depotLeader && $depotLeader->total > 0)
+                        <span style="font-size:0.85rem; display:block; color:var(--success); font-weight:600;">{{ $depotLeader->total }} vente(s)</span>
+                    @endif
+                </div>
+            </div>
+        </div>
 
         <div class="stat-card accent-yellow">
             <div class="stat-icon-wrapper">🚚</div>
@@ -32,46 +51,54 @@
             </div>
         </div>
     </div>
-
+<!-- Graphique des ventes par dépôt -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">📈 Répartition graphique des ventes par dépôt</h3>
+        </div>
+        <div class="card-body" style="padding: 1.5rem;">
+            <canvas id="ventesDepotChart" height="100"></canvas>
+        </div>
+    </div>
     <!-- État global des stocks par produit -->
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">📦 État des stocks par produit</h3>
         </div>
-<div class="table-responsive">
-    <table>
-        <thead>
-            <tr>
-                <th>Dépôt</th>
-                <th>Marque</th>
-                <th>Couleur</th>
-                <th>Type</th>
-                <th style="text-align: right;">En stock (Pleines)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($tousLesStocks as $stock)
-                <tr>
-                    <td style="color: var(--text-muted);">{{ $stock->depot->nom }}</td>
-                    <td style="font-weight: 600;">{{ $stock->couleur->marque->nom ?? 'N/A' }}</td>
-                    <td>{{ $stock->couleur->nom_couleur }}</td>
-                    <td>{{ $stock->couleur->type }}</td>
-                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace; font-weight: 700;">
-                        <span class="badge {{ $stock->quantite_pleines < 5 ? 'badge-suspendu' : 'badge-actif' }}">
-                            {{ $stock->quantite_pleines }} unité(s)
-                        </span>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">
-                        Aucun produit en stock pour le moment.
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dépôt</th>
+                        <th>Marque</th>
+                        <th>Couleur</th>
+                        <th>Type</th>
+                        <th style="text-align: right;">En stock (Pleines)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($tousLesStocks as $stock)
+                        <tr>
+                            <td style="color: var(--text-muted);">{{ $stock->depot->nom }}</td>
+                            <td style="font-weight: 600;">{{ $stock->couleur->marque->nom ?? 'N/A' }}</td>
+                            <td>{{ $stock->couleur->nom_couleur }}</td>
+                            <td>{{ $stock->couleur->type }}</td>
+                            <td style="text-align: right; font-family: 'JetBrains Mono', monospace; font-weight: 700;">
+                                <span class="badge {{ $stock->quantite_pleines < 5 ? 'badge-suspendu' : 'badge-actif' }}">
+                                    {{ $stock->quantite_pleines }} unité(s)
+                                </span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                                Aucun produit en stock pour le moment.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Ventes du jour par dépôt -->
@@ -89,9 +116,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($ventesParDepot as $ligne)
+                    @forelse ($ventesParDepot as $index => $ligne)
                         <tr>
-                            <td style="font-weight: 700;">{{ $ligne->depot_nom }}</td>
+                            <td style="font-weight: 700;">
+                                {{ $ligne->depot_nom }}
+                                {{-- Ajout d'un badge distinctif pour le premier du classement --}}
+                                @if($index === 0 && $ligne->total > 0)
+                                    <span class="badge badge-actif" style="margin-left: 8px; font-size: 0.7rem;">⭐ Top 1</span>
+                                @endif
+                            </td>
                             <td style="text-align: right; font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--primary);">
                                 {{ $ligne->total }}
                             </td>
@@ -111,7 +144,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
+  </div>
 
     <!-- Alertes stock bas -->
     <div class="card">
@@ -150,4 +183,34 @@
             </table>
         </div>
     </div>
+    <!-- Script Chart.js mis directement ici -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('ventesDepotChart').getContext('2d');
+        const labels = @json($ventesParDepot->pluck('depot_nom'));
+        const data = @json($ventesParDepot->pluck('total'));
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Bouteilles vendues',
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    }
+                }
+            }
+        });
+    </script>
 @endsection

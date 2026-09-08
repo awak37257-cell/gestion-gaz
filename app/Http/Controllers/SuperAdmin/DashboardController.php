@@ -18,15 +18,19 @@ class DashboardController extends Controller
         // Revenu mensuel récurrent : on ramène chaque abonnement à son
         // équivalent mensuel pour pouvoir les additionner entre eux.
         $mrr = $clients->where('statut', 'actif')->sum(function ($client) {
-            return match ($client->periode_abonnement) {
-                'mensuel' => $client->montant_abonnement,
+            // Utilise la bonne propriété de ton modèle (periode_souhaitee ou periode_abonnement)
+            $periode = $client->periode_souhaitee ?? $client->periode_abonnement ?? 'mensuel';
+
+            return match (strtolower($periode)) {
                 'trimestriel' => $client->montant_abonnement / 3,
                 'annuel' => $client->montant_abonnement / 12,
+                default => $client->montant_abonnement, // Par défaut mensuel
             };
         });
 
         $expirationProche = $clients->filter(function ($client) {
             return $client->statut === 'actif'
+                && $client->date_fin_abonnement 
                 && $client->date_fin_abonnement->isFuture()
                 && now()->diffInDays($client->date_fin_abonnement) <= 30;
         })->count();

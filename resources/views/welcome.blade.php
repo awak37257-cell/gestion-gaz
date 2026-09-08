@@ -484,12 +484,12 @@
     <div class="navbar-links">
         <a href="#apercu">Aperçu & Modules</a>
         <a href="#roles">Pour qui ?</a>
-        <a href="#stack">Technologies</a>
+       
         <a href="#tarifs">Tarifs</a>
         <a href="#charte">Charte d'utilisation</a>
     </div>
-    <div class="navbar-cta">
-    
+    <div class="navbar-cta" style="display: flex; gap: 10px; align-items: center;">
+        <a href="{{ route('login') }}" class="btn-nav-login" style="padding: 8px 16px; text-decoration: none; color: inherit;">Connexion</a>
         <a href="#demande-acces" class="btn-nav-cta">Obtenir mon compte</a>
     </div>
 </nav>
@@ -804,73 +804,7 @@
 <hr class="section-divider">
 
 <!-- ════ CE QUI A ÉTÉ UTILISÉ POUR CRÉER LE SITE ═════════════ -->
-<section id="stack">
-    <div class="container">
-        <div class="section-header center">
-            <div class="section-label">🛠️ Technologies & Conception</div>
-            <h2 class="section-title">Ce qui a été utilisé pour créer le site</h2>
-            <p class="section-subtitle">Une pile technologique moderne, éprouvée et sécurisée garantissant rapidité et fiabilité.</p>
-        </div>
 
-        <div class="tech-grid">
-            <div class="tech-card">
-                <div class="tech-logo">🟥</div>
-                <div class="tech-name">Laravel 12</div>
-                <div class="tech-role">Framework PHP robuste</div>
-                <div class="tech-tag">Backend</div>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">🐘</div>
-                <div class="tech-name">PHP 8.3</div>
-                <div class="tech-role">Moteur serveur haute vitesse</div>
-                <div class="tech-tag">Serveur</div>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">🗄️</div>
-                <div class="tech-name">MySQL</div>
-                <div class="tech-role">Base de données relationnelle</div>
-                <div class="tech-tag">Data</div>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">🌊</div>
-                <div class="tech-name">Tailwind CSS 4</div>
-                <div class="tech-role">Design système responsive</div>
-                <div class="tech-tag">UI</div>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">⚡</div>
-                <div class="tech-name">Vite.js</div>
-                <div class="tech-role">Compilateur d'assets</div>
-                <div class="tech-tag">Build</div>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">🍃</div>
-                <div class="tech-name">Blade</div>
-                <div class="tech-role">Moteur de templates dynamiques</div>
-                <div class="tech-tag">Frontend</div>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">🔐</div>
-                <div class="tech-name">Laravel Auth</div>
-                <div class="tech-role">Isolation multi-tenant sécurisée</div>
-                <div class="tech-tag">Sécurité</div>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">📱</div>
-                <div class="tech-name">QR Engine</div>
-                <div class="tech-role">Génération d'accès par QR Code</div>
-                <div class="tech-tag">Mobile</div>
-            </div>
-        </div>
-    </div>
-</section>
 
 <hr class="section-divider">
 

@@ -11,13 +11,21 @@ class DashboardController extends Controller
     {
         $vendeur = Vendeur::with('depot')->findOrFail(session('vendeur_id'));
 
+        // Ventes du jour
         $ventesDuJour = $vendeur->ventes()
             ->whereDate('date_heure', today())
             ->with(['couleurVendue.marque', 'couleurDemandee'])
             ->latest('date_heure')
             ->get();
 
-        $nombreVentes = $ventesDuJour->count();
+        // Somme des quantités vendues aujourd'hui
+        $nombreVentesJour = $ventesDuJour->sum('quantite');
+
+        // Somme des quantités vendues ce mois-ci
+        $nombreVentesMois = $vendeur->ventes()
+            ->whereMonth('date_heure', now()->month)
+            ->whereYear('date_heure', now()->year)
+            ->sum('quantite');
 
         $changementsEffectues = $ventesDuJour->filter->estSubstitution();
 
@@ -30,7 +38,8 @@ class DashboardController extends Controller
         return view('vendeur.dashboard', compact(
             'vendeur',
             'ventesDuJour',
-            'nombreVentes',
+            'nombreVentesJour',
+            'nombreVentesMois',
             'changementsEffectues',
             'demandesEnAttente',
         ));
