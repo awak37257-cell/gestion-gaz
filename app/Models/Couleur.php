@@ -60,6 +60,6 @@ class Couleur extends Model
 
     public function nomComplet(): string
     {
-        return "{$this->marque->nom} {$this->nom_couleur} ({$this->poids})";
+        return "{$this->marque->nom} {$this->nom_couleur} ({$this->type})";
     }
 }

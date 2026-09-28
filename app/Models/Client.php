@@ -1,20 +1,22 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Contracts\Auth\Authenticatable; // 1. Importer l'interface
+use Illuminate\Auth\Authenticatable as AuthenticatableTrait; // 2. Importer le trait
 
-class Client extends Model
+class Client extends Model implements Authenticatable
 {
-    use HasFactory;
+    use HasFactory, AuthenticatableTrait; // 3. Ajouter le trait ici
 
     protected $fillable = [
         'nom',
         'slug',
-        'email_contact',
+        'email',
         'telephone',
+        'password',
         'periode_abonnement',
         'montant_abonnement',
         'date_debut_abonnement',

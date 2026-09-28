@@ -15,47 +15,50 @@ use Illuminate\Support\Str;
 
 class ClientController extends Controller
 {
- public function index(Request $request): View
-{
-    $recherche = $request->string('recherche')->trim()->toString();
-    $statutFiltre = $request->string('statut')->toString();
+    public function index(Request $request): View
+    {
+        $recherche = $request->string('recherche')->trim()->toString();
+        $statutFiltre = $request->string('statut')->toString();
 
-    $clients = Client::withCount(['depots', 'users'])
-        ->when($recherche, fn ($q) => $q->where('nom', 'like', "%{$recherche}%"))
-        ->when($statutFiltre, fn ($q) => $q->where('statut', $statutFiltre))
-        ->latest()
-        ->get();
+        $clients = Client::withCount(['depots', 'users'])
+            ->when($recherche, fn ($q) => $q->where('nom', 'like', "%{$recherche}%"))
+            ->when($statutFiltre, fn ($q) => $q->where('statut', $statutFiltre))
+            ->latest()
+            ->get();
 
-    // Calcul des statistiques pour les cartes du haut
-    $clientsActifs = $clients->where('statut', 'actif')->count();
-    $mrr = $clients->where('statut', 'actif')->sum('prix_abonnement');
-    
-    $expirationProche = $clients->filter(function ($client) {
-        return isset($client->date_expiration) && 
-               \Carbon\Carbon::parse($client->date_expiration)->isBetween(now(), now()->addDays(30));
-    })->count();
+        // Calcul des statistiques pour les cartes du haut
+        $clientsActifs = $clients->where('statut', 'actif')->count();
+        
+        // CORRECTION : Utilisation de 'montant_abonnement' au lieu de 'prix_abonnement'
+        $mrr = $clients->where('statut', 'actif')->sum('montant_abonnement');
+        
+        // CORRECTION : Utilisation de 'date_fin_abonnement' au lieu de 'date_expiration'
+        $expirationProche = $clients->filter(function ($client) {
+            return isset($client->date_fin_abonnement) && 
+                   \Carbon\Carbon::parse($client->date_fin_abonnement)->isBetween(now(), now()->addDays(30));
+        })->count();
 
-    // Calcul du total des dépôts sur l'ensemble des clients chargés (ou via la relation/somme des depots_count)
-    $totalDepots = $clients->sum('depots_count');
+        // Calcul du total des dépôts sur l'ensemble des clients chargés
+        $totalDepots = $clients->sum('depots_count');
 
-    foreach ($clients as $client) {
-        $client->derniere_activite = Vente::where('client_id', $client->id)->max('date_heure');
-        $client->ventes_ce_mois = Vente::where('client_id', $client->id)
-            ->whereMonth('date_heure', now()->month)
-            ->whereYear('date_heure', now()->year)
-            ->count();
+        foreach ($clients as $client) {
+            $client->derniere_activite = Vente::where('client_id', $client->id)->max('date_heure');
+            $client->ventes_ce_mois = Vente::where('client_id', $client->id)
+                ->whereMonth('date_heure', now()->month)
+                ->whereYear('date_heure', now()->year)
+                ->count();
+        }
+
+        return view('super-admin.clients.index', compact(
+            'clients', 
+            'recherche', 
+            'statutFiltre', 
+            'clientsActifs', 
+            'mrr', 
+            'expirationProche', 
+            'totalDepots'
+        ));
     }
-
-    return view('super-admin.clients.index', compact(
-        'clients', 
-        'recherche', 
-        'statutFiltre', 
-        'clientsActifs', 
-        'mrr', 
-        'expirationProche', 
-        'totalDepots'
-    ));
-}
 
     public function store(Request $request): RedirectResponse
     {
@@ -77,8 +80,6 @@ class ClientController extends Controller
             'annuel' => $dateDebut->copy()->addYear(),
         };
 
-        // Mot de passe généré automatiquement : affiché une seule fois à la
-        // création, jamais stocké en clair ni renvoyé ensuite.
         $motDePasseGenere = Str::random(10);
 
         $client = DB::transaction(function () use ($donnees, $dateDebut, $dateFin, $motDePasseGenere) {
@@ -138,8 +139,6 @@ class ClientController extends Controller
         return redirect()->route('super-admin.clients.index')->with('succes', 'Client mis à jour.');
     }
 
-    // Prolonge l'abonnement d'une période (mensuelle/trimestrielle/annuelle)
-    // à partir de la date de fin actuelle, et repasse le client en actif.
     public function renouveler(Client $client): RedirectResponse
     {
         $nouvelleDateFin = match ($client->periode_abonnement) {
@@ -156,7 +155,6 @@ class ClientController extends Controller
         return back()->with('succes', "Abonnement renouvelé jusqu'au {$nouvelleDateFin->format('d/m/Y')}.");
     }
 
-    // Bascule rapide entre actif et suspendu, sans passer par le formulaire.
     public function basculerStatut(Client $client): RedirectResponse
     {
         $client->update([
@@ -166,8 +164,6 @@ class ClientController extends Controller
         return back()->with('succes', 'Statut mis à jour.');
     }
 
-    // Génère un nouveau mot de passe pour le premier admin du client,
-    // affiché une seule fois — utile si le client l'a perdu.
     public function reinitialiserMotDePasse(Client $client): RedirectResponse
     {
         $utilisateur = $client->users()->first();
@@ -185,21 +181,32 @@ class ClientController extends Controller
             ->with('succes', 'Mot de passe réinitialisé.');
     }
 
-    public function enregistrerPaiement(Request $request, Client $client): RedirectResponse
-    {
-        $donnees = $request->validate([
-            'montant' => ['required', 'integer', 'min:0'],
-            'methode' => ['required', 'in:espece,wave,orange_money,mtn_momo,virement'],
-            'date_paiement' => ['required', 'date'],
-            'notes' => ['nullable', 'string', 'max:255'],
-        ]);
+public function enregistrerPaiement(Request $request, Client $client): RedirectResponse
+{
+    $donnees = $request->validate([
+        'montant' => ['required', 'integer', 'min:0'],
+        'mode' => ['required', 'string'],      // Récupère le select 'mode'
+        'reference' => ['nullable', 'string', 'max:255'], // Récupère la référence maintenant que la colonne existe
+        'date_paiement' => ['nullable', 'date'],
+        'notes' => ['nullable', 'string', 'max:255'],
+    ]);
 
-        $client->paiements()->create($donnees);
+    // On récupère le mode du formulaire, ou 'espece' par défaut (en minuscule pour correspondre à l'Enum)
+    $methodePaiement = $donnees['mode'] ?? 'espece';
+    $datePaiement = $donnees['date_paiement'] ?? now();
 
-        return back()->with('succes', 'Paiement enregistré.');
-    }
+    // Enregistre dans la table paiements avec la référence
+    $client->paiements()->create([
+        'montant' => $donnees['montant'],
+        'methode' => $donnees['mode'],
+        'reference' => $donnees['reference'] ?? null,
+        'date_paiement' => $datePaiement,
+        'notes' => $donnees['notes'] ?? null,
+    ]);
 
-    // Export CSV (compatible Excel) de la liste des clients.
+    return back()->with('succes', 'Paiement enregistré avec succès.');
+}
+
     public function exporter(): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         $clients = Client::withCount('depots')->get();
@@ -209,7 +216,6 @@ class ClientController extends Controller
         $callback = function () use ($clients) {
             $handle = fopen('php://output', 'w');
 
-            // BOM UTF-8 pour qu'Excel affiche correctement les accents.
             fwrite($handle, "\xEF\xBB\xBF");
 
             fputcsv($handle, ['Nom', 'Email', 'Téléphone', 'Périodicité', 'Montant', 'Début', 'Fin', 'Statut', 'Dépôts']);

@@ -12,23 +12,23 @@
         <form action="{{ route('super-admin.demandes.envoyer-acces', $demande) }}" method="POST">
             @csrf
 
-            <div style="margin-bottom: 1.5rem;">
-                <label class="form-label">Aperçu du lien d'accès (Page d'accueil) :</label>
-                <div style="font-family: monospace; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; color: #64748b; word-break: break-all;">
+            <div class="mb-3" style="margin-bottom: 1.5rem;">
+                <label class="form-label" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Aperçu du lien d'accès (Page d'accueil) :</label>
+                <div style="font-family: monospace; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; color: #64748b; word-break: break-all;">
                     {{ url('/') }}?client=<span id="aperçu-slug" style="color: #2563eb; font-weight: bold;">{{ $client->slug }}</span>
                 </div>
             </div>
 
-            <div style="margin-bottom: 1.5rem;">
-                <label for="slug" class="form-label">Personnaliser le segment (Identifiant / Slug) :</label>
-                <input type="text" name="slug" id="slug" value="{{ old('slug', $client->slug) }}" class="form-control" required style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px;">
-                <small style="color: var(--text-muted); display: block; margin-top: 4px;">Exemple : <code>gaz-marahoue-2</code> ou <code>client-2</code> selon votre choix.</small>
+            <div class="mb-3" style="margin-bottom: 1.5rem;">
+                <label for="slug" class="form-label" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Personnaliser le segment (Identifiant / Slug) :</label>
+                <input type="text" name="slug" id="slug" value="{{ old('slug', $client->slug) }}" class="form-control" required>
+                <small style="color: var(--text-muted, #64748b); display: block; margin-top: 6px;">Exemple : <code>gaz-marahoue-2</code> ou <code>client-2</code> selon votre choix.</small>
                 @error('slug')
-                    <span style="color: var(--danger); font-size: 0.85rem;">{{ $message }}</span>
+                    <span style="color: var(--danger, #dc2626); font-size: 0.85rem; display: block; margin-top: 4px;">{{ $message }}</span>
                 @enderror
             </div>
 
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 2rem;">
                 <a href="{{ route('super-admin.demandes.index') }}" class="btn btn-secondary">Annuler</a>
                 <button type="submit" class="btn btn-primary" onclick="return confirm('Confirmer l\'envoi des accès par e-mail au client ?')">
                     🚀 Enregistrer et envoyer les accès par e-mail
@@ -39,12 +39,14 @@
 </div>
 
 <script>
-    // Petit script pour mettre à jour l'aperçu en direct quand le super-admin tape
+    // Script pour mettre à jour l'aperçu en direct quand le super-admin tape
     const inputSlug = document.getElementById('slug');
     const apercuSlug = document.getElementById('aperçu-slug');
     
-    inputSlug.addEventListener('input', function() {
-        apercuSlug.textContent = this.value || '...';
-    });
+    if (inputSlug && apercuSlug) {
+        inputSlug.addEventListener('input', function() {
+            apercuSlug.textContent = this.value || '...';
+        });
+    }
 </script>
 @endsection

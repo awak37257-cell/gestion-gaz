@@ -113,5 +113,36 @@
                 Aucune demande en cours.
             </p>
         @endforelse
+        
     </div>
+    <!-- Alerte Stocks en Manque -->
+    @if(isset($stocksEnManque) && $stocksEnManque->isNotEmpty())
+        <div class="carte" style="border-left: 4px solid #ef4444; background: #fef2f2; margin-bottom: 1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <h3 style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;margin:0;color:#991b1b;">
+                    ⚠️ Alertes : Stocks en manque / épuisés
+                </h3>
+            </div>
+            <p style="font-size:0.78rem; color:#7f1d1d; margin-bottom:0.75rem;">
+                Les bouteilles suivantes nécessitent un réassort rapide :
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                @foreach ($stocksEnManque as $stock)
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:0.5rem 0.75rem; border-radius:6px; border:1px solid #fecaca; font-size:0.85rem;">
+                        <div>
+                            <strong>{{ $stock->couleur->nomComplet() }}</strong>
+                        </div>
+                        <div style="font-family:'JetBrains Mono',monospace; font-weight:800; color: {{ $stock->quantite_pleines == 0 ? '#ef4444' : '#d97706' }};">
+                            {{ $stock->quantite_pleines }} en stock
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            <div style="margin-top: 0.75rem; text-align: right;">
+                <a href="{{ route('vendeur.demandes.create') }}" style="font-size:0.8rem; font-weight:700; color:#dc2626; text-decoration:none;">
+                    Faire un réassort maintenant ➔
+                </a>
+            </div>
+        </div>
+    @endif
 @endsection

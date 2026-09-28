@@ -11,14 +11,19 @@ class EnsureIsClientAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user();
+        // 1. Récupérer le client connecté via le guard 'client'
+        $client = Auth::guard('client')->user();
 
-        if (! $user || $user->estSuperAdmin()) {
-            abort(403, 'Cette section est réservée aux comptes clients.');
+        // 2. Si aucun client n'est connecté, on bloque ou on redirige vers le login
+        if (! $client) {
+            return redirect()->route('login')->withErrors([
+                'email' => 'Veuillez vous connecter pour accéder à cette section.',
+            ]);
         }
 
-        if (! $user->client || ! $user->client->estActif()) {
-            Auth::logout();
+        // 3. Vérifier si le client est actif (méthode définie dans votre modèle Client)
+        if (! $client->estActif()) {
+            Auth::guard('client')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 

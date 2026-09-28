@@ -476,6 +476,11 @@
             <a href="{{ route('admin.demandes.index') }}" class="sidebar-link {{ request()->routeIs('admin.demandes.*') ? 'active' : '' }}">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
                 Approvisionnements
+                @if(isset($demandesEnAttenteCount) && $demandesEnAttenteCount > 0)
+        <span style="background: #ef4444; color: white; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 10px; min-width: 18px; text-align: center;">
+            {{ $demandesEnAttenteCount }}
+        </span>
+    @endif
             </a>
 
             <a href="{{ route('admin.inventaires.index') }}" class="sidebar-link {{ request()->routeIs('admin.inventaires.*') ? 'active' : '' }}">
@@ -532,9 +537,23 @@
     <div class="main-wrapper" style="{{ session('impersonation_super_admin_id') ? 'padding-top: 36px;' : '' }}">
         <header class="topbar">
             <h1 class="topbar-title">@yield('titre', 'Administration')</h1>
-            <div style="font-size:0.82rem;color:var(--text-muted);">
-                Abonnement : <span class="badge badge-actif">{{ ucfirst(auth()->user()->client?->periode_abonnement ?? 'Actif') }}</span>
-            </div>
+           @php
+    $clientConnecte = Auth::guard('client')->user();
+    $dateFin = $clientConnecte && $clientConnecte->date_fin_abonnement ? \Carbon\Carbon::parse($clientConnecte->date_fin_abonnement) : null;
+    $joursRestants = $dateFin ? now()->diffInDays($dateFin, false) : null;
+@endphp
+
+{{-- Le bloc s'affiche uniquement s'il reste 10 jours ou moins (ou si c'est expiré) --}}
+@if($joursRestants !== null && $joursRestants <= 10)
+    <div style="font-size: 0.82rem; color: var(--text-muted);">
+        Abonnement : 
+        @if($joursRestants < 0)
+            <span class="badge" style="background: #FEE2E2; color: #991B1B; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Expiré</span>
+        @else
+            <span class="badge" style="background: #FEF3C7; color: #92400E; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Expire dans {{ ceil($joursRestants) }} j</span>
+        @endif
+    </div>
+@endif
         </header>
 
         <main class="content-area">

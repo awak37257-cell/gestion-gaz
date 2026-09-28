@@ -1,47 +1,52 @@
 <?php
-
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class ParametreController extends Controller
 {
     public function index()
     {
-        $admin = auth()->user();
-        $client = $admin->client; // Assure-toi d'avoir défini la relation client() dans ton modèle User
+        // Récupérer directement le client connecté via le guard 'client'
+        $client = Auth::guard('client')->user();
 
-        return view('admin.parametres.index', compact('admin', 'client'));
+        return view('admin.parametres.index', compact('client'));
     }
 
     public function update(Request $request)
     {
-        $admin = auth()->user();
-        $client = $admin->client;
+        $client = Auth::guard('client')->user();
 
         $request->validate([
-            'nom_entreprise' => 'required|string|max:255',
-            'email_contact' => 'nullable|email|max:255',
-            'telephone' => 'nullable|string|max:20',
-            'admin_nom' => 'required|string|max:255',
-            'admin_email' => 'required|email|max:255|unique:users,email,' . $admin->id,
+            'nom' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:clients,email,' . $client->id],
+            'telephone' => ['nullable', 'string', 'max:20'],
+            // Validation optionnelle pour le mot de passe
+            'current_password' => ['nullable', 'required_with:password'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
 
-        // Mise à jour des informations de l'entreprise
-        if ($client) {
-            $client->update([
-                'nom' => $request->nom_entreprise,
-                'email_contact' => $request->email_contact,
-                'telephone' => $request->telephone,
-            ]);
+        // Mise à jour des informations de base
+        $client->nom = $request->input('nom');
+        $client->email = $request->input('email');
+        $client->telephone = $request->input('telephone');
+
+        // Gestion de la modification du mot de passe si rempli
+        if ($request->filled('password')) {
+            if (!Hash::check($request->input('current_password'), $client->password)) {
+                throw ValidationException::withMessages([
+                    'current_password' => ['Le mot de passe actuel est incorrect.'],
+                ]);
+            }
+
+            $client->password = Hash::make($request->input('password'));
         }
 
-        // Mise à jour du compte administrateur connecté
-        $admin->update([
-            'name' => $request->admin_nom,
-            'email' => $request->admin_email,
-        ]);
+        $client->save();
 
         return redirect()->route('admin.parametres.index')->with('success', 'Paramètres mis à jour avec succès.');
     }

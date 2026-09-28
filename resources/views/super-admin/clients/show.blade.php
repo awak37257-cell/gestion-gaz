@@ -135,12 +135,12 @@
             </div>
             <div>
                 <label class="form-label" for="mode">Mode de règlement</label>
-                <select name="mode" id="mode" class="form-control">
-                    <option value="Mobile Money">Mobile Money (Orange / MTN)</option>
-                    <option value="Virement">Virement bancaire</option>
-                    <option value="Espèces">Espèces</option>
-                    <option value="Chèque">Chèque</option>
-                </select>
+               <select name="mode" id="mode" class="form-control">
+    <option value="espece">Espèces</option>
+    <option value="wave">Wave</option>
+    <option value="orange_money">Orange Money</option>
+    <option value="mtn_momo">MTN Momo</option>
+</select>
             </div>
             <div>
                 <label class="form-label" for="reference">Référence / Reçu</label>
@@ -172,8 +172,8 @@
                         <tr>
                             <td>{{ $p->created_at->format('d/m/Y H:i') }}</td>
                             <td style="font-family:'JetBrains Mono',monospace;font-weight:700;">{{ number_format($p->montant, 0, ',', ' ') }} FCFA</td>
-                            <td><span class="badge badge-purple">{{ $p->mode ?? 'Virement' }}</span></td>
-                            <td>{{ $p->reference ?? '—' }}</td>
+                            <td><span class="badge badge-purple">{{ $p->methode}}</span></td>
+                            <td>{{ $p->reference ?? '—' }}</td> 
                         </tr>
                     @empty
                         <tr>

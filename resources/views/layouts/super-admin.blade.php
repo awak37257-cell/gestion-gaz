@@ -511,9 +511,7 @@
         <header class="topbar">
             <h1 class="topbar-title">@yield('titre', 'Super Admin')</h1>
             <div class="topbar-actions">
-                <a href="{{ route('super-admin.clients.create') }}" class="btn btn-primary btn-sm">
-                    + Nouveau Client
-                </a>
+                
             </div>
         </header>
 

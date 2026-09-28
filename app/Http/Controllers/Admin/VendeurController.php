@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Depot;
 use App\Models\Vendeur;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -26,15 +27,17 @@ class VendeurController extends Controller
         return view('admin.vendeurs.create', compact('depots'));
     }
 
-    public function store(Request $request): RedirectResponse
+   public function store(Request $request)
     {
         $donnees = $request->validate([
             'depot_id' => ['required', 'exists:depots,id'],
             'nom' => ['required', 'string', 'max:255'],
         ]);
 
+        $clientId = Auth::guard('client')->id() ?? auth()->user()->client_id;
+
         $vendeur = Vendeur::create([
-            'client_id' => auth()->user()->client_id,
+            'client_id' => $clientId,
             ...$donnees,
             'token_qr' => Str::random(32),
             'actif' => true,
@@ -46,7 +49,7 @@ class VendeurController extends Controller
     // Affiche la fiche du vendeur avec son QR code à imprimer/donner.
     public function show(Vendeur $vendeur): View
     {
-      $urlScan = 'https://thousands-corps-bag-eminem.trycloudflare.com' . route('vendeur.scan', ['tokenQr' => $vendeur->token_qr], false);
+      $urlScan = 'https://bids-ind-impacts-exactly.trycloudflare.com' . route('vendeur.scan', ['tokenQr' => $vendeur->token_qr], false);
 
         return view('admin.vendeurs.show', compact('vendeur', 'urlScan'));
     }

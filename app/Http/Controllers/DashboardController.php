@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vendeur;
+use App\Models\Stock;
+use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
 
 class DashboardController extends Controller
 {
-    public function index(): View
+public function index(): View
     {
         $vendeur = Vendeur::with('depot')->findOrFail(session('vendeur_id'));
 
@@ -35,6 +37,12 @@ class DashboardController extends Controller
             ->latest('date')
             ->get();
 
+        // Récupération des stocks en manque (quantité de bouteilles pleines critique ou nulle)
+        $stocksEnManque = Stock::where('depot_id', $vendeur->depot_id)
+            ->with('couleur.marque')
+            ->where('quantite_pleines', '<=', 2) // Seuil d'alerte (modifiable selon vos besoins)
+            ->get();
+
         return view('vendeur.dashboard', compact(
             'vendeur',
             'ventesDuJour',
@@ -42,6 +50,7 @@ class DashboardController extends Controller
             'nombreVentesMois',
             'changementsEffectues',
             'demandesEnAttente',
+            'stocksEnManque', // <-- Ajouté ici pour l'affichage de l'alerte
         ));
     }
 }

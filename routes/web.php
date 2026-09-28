@@ -28,11 +28,10 @@ Route::get('/', function () {
 })->name('home');
 
 Route::post('/demande-acces', [DemandeAccesController::class, 'store'])->name('demande-acces.store');
-
 Route::middleware('client.actif')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-// Route pour l'espace personnalisé du client via son slug unique
-Route::get('/espace/{client:slug}', [ClientEspaceController::class, 'show'])->name('client.espace');
+    // Route pour l'espace personnalisé du client via son slug unique
+    Route::get('/espace/{client:slug}', [ClientEspaceController::class, 'show'])->name('client.espace');
     Route::resource('depots', DepotController::class)->except('show');
     Route::resource('marques', MarqueController::class)->except('show');
     Route::resource('couleurs', CouleurController::class)->except('show');
@@ -57,17 +56,20 @@ Route::get('/espace/{client:slug}', [ClientEspaceController::class, 'show'])->na
 Route::middleware(['auth', 'super-admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
     Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/paiements', [SuperAdminPaiementController::class, 'index'])->name('paiements.index');
-   // Afficher le formulaire pour configurer le lien et envoyer
-Route::get('/demandes/{demande}/lien', [SuperAdminDemandeAccesController::class, 'formulaireLien'])->name('demandes.formulaire-lien');
-
-// Traiter le formulaire et envoyer l'e-mail
-Route::post('/demandes/{demande}/envoyer-acces', [SuperAdminDemandeAccesController::class, 'envoyerAcces'])->name('demandes.envoyer-acces');
+    
     // Gestion des demandes d'accès publiques
     Route::get('/demandes-acces', [SuperAdminDemandeAccesController::class, 'index'])->name('demandes.index');
+    Route::get('/demandes/{demande}/creer', [SuperAdminDemandeAccesController::class, 'create'])->name('demandes.create');
     Route::post('/demandes-acces/{demande}/valider', [SuperAdminDemandeAccesController::class, 'valider'])->name('demandes.valider');
     Route::post('/demandes-acces/{demande}/rejeter', [SuperAdminDemandeAccesController::class, 'rejeter'])->name('demandes.rejeter');
     Route::delete('/demandes-acces/{demande}', [SuperAdminDemandeAccesController::class, 'destroy'])->name('demandes.destroy');
-    Route::get('/demandes/{demande}/creer', [SuperAdminDemandeAccesController::class, 'create'])->name('super-admin.demandes.create');
+    
+    // Afficher le formulaire pour configurer le lien et envoyer
+    Route::get('/demandes/{demande}/lien', [SuperAdminDemandeAccesController::class, 'formulaireLien'])->name('demandes.formulaire-lien');
+
+    // Traiter le formulaire et envoyer l'e-mail
+    Route::post('/demandes/{demande}/envoyer-acces', [SuperAdminDemandeAccesController::class, 'envoyerAcces'])->name('demandes.envoyer-acces');
+
     // Gestion des clients
     Route::get('/clients/export', [SuperAdminClientController::class, 'exporter'])->name('clients.exporter');
     Route::resource('clients', SuperAdminClientController::class);
@@ -81,6 +83,7 @@ Route::post('/demandes/{demande}/envoyer-acces', [SuperAdminDemandeAccesControll
 Route::post('/impersonation/quitter', [ImpersonationController::class, 'quitter'])
     ->name('impersonation.quitter')
     ->middleware('auth');
+
 // Accès via QR code personnel du vendeur
 Route::get('/vendeur/scan/{tokenQr}', [VendeurAccessController::class, 'scan'])->name('vendeur.scan');
 
@@ -93,24 +96,19 @@ Route::middleware('vendeur.connecte')->prefix('vendeur')->name('vendeur.')->grou
 
     Route::get('/demandes/creer', [DemandeApprovisionnementController::class, 'create'])->name('demandes.create');
     Route::post('/demandes', [DemandeApprovisionnementController::class, 'store'])->name('demandes.store');
-Route::get('/ventes/{vente}/recu', [VenteController::class, 'recu'])->name('ventes.recu');
+    Route::get('/ventes/{vente}/recu', [VenteController::class, 'recu'])->name('ventes.recu');
 
-Route::get('/inventaires/creer', [InventaireController::class, 'create'])->name('inventaires.create');
-Route::post('/inventaires', [InventaireController::class, 'store'])->name('inventaires.store');
-Route::get('/inventaires/{inventaire}', [InventaireController::class, 'show'])->name('inventaires.show');
+    Route::get('/inventaires/creer', [InventaireController::class, 'create'])->name('inventaires.create');
+    Route::post('/inventaires', [InventaireController::class, 'store'])->name('inventaires.store');
+    Route::get('/inventaires/{inventaire}', [InventaireController::class, 'show'])->name('inventaires.show');
+});
 
-    });
-    // Afficher le formulaire de connexion (GET)
 Route::get('/presentation', function () {
     return view('presentation');
 })->name('presentation');
 
 Route::get('/login', [LoginController::class, 'create'])->name('login');
-
-// Traiter la connexion (POST)
 Route::post('/login', [LoginController::class, 'store']);
-
-// Déconnexion (POST ou GET selon ton implémentation, POST est recommandé)
 Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
 Route::get('/espace/{client:slug}', [ClientEspaceController::class, 'show'])->name('client.espace');

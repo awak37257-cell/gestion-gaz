@@ -11,9 +11,10 @@ class Paiement extends Model
     use HasFactory;
 
     protected $fillable = [
-        'client_id',
+'client_id',
         'montant',
         'methode',
+        'reference',     // <--- VÉRIFIEZ QUE CECI EST BIEN PRÉSENT !
         'date_paiement',
         'notes',
     ];

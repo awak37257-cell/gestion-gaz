@@ -38,11 +38,17 @@ return [
     */
 
     'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'users',
     ],
+    
+    // Ajoutez ceci :
+    'client' => [
+        'driver' => 'session',
+        'provider' => 'clients',
+    ],
+],
 
     /*
     |--------------------------------------------------------------------------
@@ -71,6 +77,10 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+        'clients' => [
+            'driver' => 'eloquent',
+            'model' => env('CLIENT_MODEL',App\Models\Client::class),
+        ],
     ],
 
     /*

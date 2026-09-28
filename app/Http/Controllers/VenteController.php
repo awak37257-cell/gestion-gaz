@@ -37,7 +37,7 @@ class VenteController extends Controller
         return view('vendeur.ventes.create', compact('couleurs'));
     }
 
-    public function store(Request $request): RedirectResponse
+public function store(Request $request): RedirectResponse
     {
         $vendeur = Vendeur::findOrFail(session('vendeur_id'));
 
@@ -49,22 +49,48 @@ class VenteController extends Controller
         ]);
 
         $vente = DB::transaction(function () use ($vendeur, $donnees) {
-            $stock = Stock::where('depot_id', $vendeur->depot_id)
+            // 1. Gestion du stock de la couleur vendue (sortie des pleines)
+            $stockVendu = Stock::where('depot_id', $vendeur->depot_id)
                 ->where('couleur_id', $donnees['couleur_vendue_id'])
                 ->lockForUpdate()
                 ->first();
 
-            if (! $stock || $stock->quantite_pleines < $donnees['quantite']) {
+            if (! $stockVendu || $stockVendu->quantite_pleines < $donnees['quantite']) {
                 throw ValidationException::withMessages([
                     'couleur_vendue_id' => 'Stock insuffisant pour cette couleur dans ce dépôt.',
                 ]);
             }
 
-            $stock->decrement('quantite_pleines', $donnees['quantite']);
-            $stock->increment('quantite_vides', $donnees['quantite']);
+            $stockVendu->decrement('quantite_pleines', $donnees['quantite']);
 
-            // Le prix est figé au moment de la vente : si l'admin change le prix
-            // de la couleur plus tard, ce reçu doit rester correct.
+            // 2. Gestion des bouteilles vides récupérées
+            if ($donnees['changement_effectue'] && !empty($donnees['couleur_demandee_id'])) {
+                // Si changement : les vides vont dans le stock de la couleur demandée par le client
+                $stockDemande = Stock::firstOrCreate(
+                    [
+                        'depot_id' => $vendeur->depot_id,
+                        'couleur_id' => $donnees['couleur_demandee_id'],
+                    ],
+                    [
+                        'client_id' => $vendeur->client_id,
+                        'quantite_pleines' => 0,
+                        'quantite_vides' => 0,
+                    ]
+                );
+
+                // On verrouille la ligne pour la mise à jour sécurisée
+                $stockDemande = Stock::where('depot_id', $vendeur->depot_id)
+                    ->where('couleur_id', $donnees['couleur_demandee_id'])
+                    ->lockForUpdate()
+                    ->first();
+
+                $stockDemande->increment('quantite_vides', $donnees['quantite']);
+            } else {
+                // Pas de changement : les vides vont dans la même couleur
+                $stockVendu->increment('quantite_vides', $donnees['quantite']);
+            }
+
+            // 3. Enregistrement de la vente
             $couleurVendue = Couleur::findOrFail($donnees['couleur_vendue_id']);
 
             return Vente::create([
@@ -80,7 +106,6 @@ class VenteController extends Controller
 
         return redirect()->route('vendeur.ventes.recu', $vente)->with('succes', 'Vente enregistrée.');
     }
-
     // Reçu imprimable à remettre au client.
     public function recu(Vente $vente): View
     {

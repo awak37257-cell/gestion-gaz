@@ -9,6 +9,7 @@ use App\Models\Stock;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DepotController extends Controller
@@ -32,9 +33,11 @@ class DepotController extends Controller
             'localisation' => ['nullable', 'string', 'max:255'],
         ]);
 
-        DB::transaction(function () use ($donnees) {
+      DB::transaction(function () use ($donnees) {
+            $clientId = Auth::guard('client')->id() ?? auth()->user()->client_id;
+
             $depot = Depot::create([
-                'client_id' => auth()->user()->client_id,
+                'client_id' => $clientId,
                 ...$donnees,
             ]);
 

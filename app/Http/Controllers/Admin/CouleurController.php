@@ -10,59 +10,79 @@ use App\Models\Stock;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CouleurController extends Controller
 {
     public function index(): View
     {
-        $marques = Marque::with('couleurs')->get();
+        $clientId = Auth::guard('client')->id() ?? auth()->user()->client_id;
+        
+        // On filtre les marques par client
+        $marques = Marque::where('client_id', $clientId)->with('couleurs')->get();
 
         return view('admin.couleurs.index', compact('marques'));
     }
 
     public function create(): View
     {
-        $marques = Marque::all();
+        $clientId = Auth::guard('client')->id() ?? auth()->user()->client_id;
+        
+        $marques = Marque::where('client_id', $clientId)->get();
+        $depots = Depot::where('client_id', $clientId)->get();
 
-        return view('admin.couleurs.create', compact('marques'));
+        return view('admin.couleurs.create', compact('marques', 'depots'));
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $clientId = Auth::guard('client')->id() ?? auth()->user()->client_id;
+
         $donnees = $request->validate([
             'marque_id' => ['required', 'exists:marques,id'],
             'nom_couleur' => ['required', 'string', 'max:255'],
             'poids' => ['required', 'string', 'max:50'],
             'prix_unitaire' => ['required', 'integer', 'min:0'],
             'type' => ['required', 'string', 'max:50'],
+            'depot_id' => ['required', 'exists:depots,id'],
+            'quantite_pleines' => ['required', 'integer', 'min:0'],
+            'quantite_vides' => ['required', 'integer', 'min:0'],
         ]);
 
-        DB::transaction(function () use ($donnees) {
+        // Extraction des données spécifiques au stock initial pour ne garder que la couleur
+        $depotId = $donnees['depot_id'];
+        $qtePleines = $donnees['quantite_pleines'];
+        $qteVides = $donnees['quantite_vides'];
+        
+        unset($donnees['depot_id'], $donnees['quantite_pleines'], $donnees['quantite_vides']);
+
+        DB::transaction(function () use ($donnees, $clientId, $depotId, $qtePleines, $qteVides) {
             $couleur = Couleur::create([
-                'client_id' => auth()->user()->client_id,
+                'client_id' => $clientId,
                 ...$donnees,
             ]);
 
-            // Une ligne de stock à 0 est créée pour chaque dépôt existant,
-            // pour que la nouvelle couleur apparaisse partout sans étape manuelle.
-            foreach (Depot::all() as $depot) {
+            // Initialisation des stocks pour tous les dépôts du client
+            foreach (Depot::where('client_id', $clientId)->get() as $depot) {
                 Stock::create([
-                    'client_id' => auth()->user()->client_id,
+                    'client_id' => $clientId,
                     'couleur_id' => $couleur->id,
                     'depot_id' => $depot->id,
-                    'quantite_pleines' => 0,
-                    'quantite_vides' => 0,
+                    // Si c'est le dépôt choisi, on applique les quantités saisies, sinon 0
+                    'quantite_pleines' => ($depot->id == $depotId) ? $qtePleines : 0,
+                    'quantite_vides' => ($depot->id == $depotId) ? $qteVides : 0,
                 ]);
             }
         });
 
-        return redirect()->route('admin.couleurs.index')->with('succes', 'Couleur créée.');
+        return redirect()->route('admin.couleurs.index')->with('succes', 'Couleur créée avec succès.');
     }
 
     public function edit(Couleur $couleur): View
     {
-        $marques = Marque::all();
+        $clientId = Auth::guard('client')->id() ?? auth()->user()->client_id;
+        $marques = Marque::where('client_id', $clientId)->get();
 
         return view('admin.couleurs.edit', compact('couleur', 'marques'));
     }
@@ -74,6 +94,7 @@ class CouleurController extends Controller
             'nom_couleur' => ['required', 'string', 'max:255'],
             'poids' => ['required', 'string', 'max:50'],
             'prix_unitaire' => ['required', 'integer', 'min:0'],
+            'type' => ['required', 'string', 'max:50'],
         ]);
 
         $couleur->update($donnees);
